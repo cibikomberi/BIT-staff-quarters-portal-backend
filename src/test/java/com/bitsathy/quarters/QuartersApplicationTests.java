@@ -1,4 +1,4 @@
-package com.bit.quarters;
+package com.bitsathy.quarters;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
