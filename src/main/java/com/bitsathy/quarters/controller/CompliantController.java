@@ -16,8 +16,6 @@ import com.bitsathy.quarters.service.CompliantService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
-
 @RestController
 @CrossOrigin
 public class CompliantController {

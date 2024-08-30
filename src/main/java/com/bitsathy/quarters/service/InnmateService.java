@@ -18,4 +18,12 @@ public class InnmateService {
     public List<Innmate> getInnmates(){
         return innmateRepo.findAll();
     }
+
+    public List<Innmate> updateInnmates(List<Innmate> innmates){
+        return innmateRepo.saveAll(innmates);
+    }
+
+    public Innmate addInnmates(Innmate innmate) {
+        return innmateRepo.save(innmate);
+    }
 }
