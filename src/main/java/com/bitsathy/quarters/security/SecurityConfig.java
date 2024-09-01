@@ -14,8 +14,10 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,7 +37,7 @@ public class SecurityConfig {
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/login/**").permitAll().anyRequest().authenticated());
         http.sessionManagement(session -> {session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);});
         http.csrf(csrf -> csrf.disable());
         http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
@@ -84,11 +86,15 @@ public class SecurityConfig {
     public JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException{
         return NimbusJwtDecoder
                         .withPublicKey(rsaKey.toRSAPublicKey())
-                        .build();
-                
+                        .build();  
     }
 
     @Bean JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource){
         return new NimbusJwtEncoder(jwkSource);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
+        return config.getAuthenticationManager();
     }
 }

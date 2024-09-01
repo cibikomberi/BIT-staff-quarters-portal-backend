@@ -1,47 +1,38 @@
 package com.bitsathy.quarters.controller;
 
-import java.time.Instant;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.bitsathy.quarters.model.Users;
+import com.bitsathy.quarters.service.UserService;
+
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000/")
 public class Front {
 
     @Autowired
-    private JwtEncoder jwtEncoder;
+    private UserService userService;
+
     @GetMapping("/hello")
     public String helloString() {
         return "hello";
     }
-    @PostMapping("/authenticate")
-    public JwtResponse authenticate(Authentication authentication) {
-        return new JwtResponse(createToken(authentication));
+    @PostMapping("/login")
+    public ResponseEntity<?> authenticate(@RequestBody Users user) {
+        // System.out.println(user);
+        // return new ResponseEntity<String>("hi",HttpStatus.OK);
+        return new ResponseEntity<>(userService.verify(user),HttpStatus.OK);
     }
-    private String createToken(Authentication authentication) {
-        var claims = JwtClaimsSet.builder()
-                    .issuer("self")
-                    .issuedAt(Instant.now())
-                    .expiresAt(Instant.now().plusSeconds(60 * 15))
-                    .subject(authentication.getName())
-                    .claim("scope", createScope(authentication))
-                    .build();
-
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-    }
-    private String createScope(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                      .map(a -> a.getAuthority())
-                      .collect(Collectors.joining(" "));
-    }
+    
     
     
 }
