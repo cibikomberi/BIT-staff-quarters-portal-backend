@@ -19,39 +19,45 @@ import com.bitsathy.quarters.repo.UserRepo;
 
 @Service
 public class UserService {
-
+    @Autowired
+    private UserRepo userRepo;
     @Autowired
     private JwtEncoder jwtEncoder;
     @Autowired
-    private UserRepo userRepo;
-
+    private PasswordEncoder encoder;
     @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private PasswordEncoder encoder;
-    
 
     public String createToken(Authentication authentication) {
         var claims = JwtClaimsSet.builder()
-                    .issuer("self")
-                    .issuedAt(Instant.now())
-                    .expiresAt(Instant.now().plusSeconds(60 * 15))
-                    .subject(authentication.getName())
-                    .claim("scope", createScope(authentication))
-                    .build();
-
+                .issuer("self")
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(60 * 15))
+                .subject(authentication.getName())
+                .claim("scope", createScope(authentication))
+                .build();
+                
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
+
     private String createScope(Authentication authentication) {
         return authentication.getAuthorities().stream()
-                      .map(a -> a.getAuthority())
-                      .collect(Collectors.joining(" "));
+                .map(a -> a.getAuthority())
+                .collect(Collectors.joining(" "));
     }
 
-    public LoginResponse verify(Users user){
-        user.setPassword(encoder.encode(user.getPassword()));
-        userRepo.save(user);
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-        return new LoginResponse(user.getId(),user.getUsername(),createToken(auth));
+    public LoginResponse verify(Users user) {
+        Authentication auth = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        user = userRepo.findByUsername(user.getUsername());
+        return new LoginResponse(user.getId(), user.getUsername(), createToken(auth),user.getRoles());
+    }
+
+    public Users register(Users user) {
+        if (userRepo.findByUsername(user.getUsername()) == null) {
+            user.setPassword(encoder.encode(user.getPassword()));
+            return userRepo.save(user);
+        }
+        return null;
     }
 }

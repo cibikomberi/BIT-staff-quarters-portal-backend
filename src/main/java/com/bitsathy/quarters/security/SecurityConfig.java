@@ -28,18 +28,26 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SecurityConfig {
 
     @Autowired
     private UserDetailsService userDetailsService;
-    
+
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth.requestMatchers("/login/**").permitAll().anyRequest().authenticated());
-        http.sessionManagement(session -> {session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);});
+        http.sessionManagement(session -> {
+            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        });
+        // http.headers(head -> head.xssProtection(xss -> xss.disable()));
         http.csrf(csrf -> csrf.disable());
+
+        // http.headers(head -> )
         http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
         http.httpBasic();
 
@@ -47,7 +55,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -55,46 +63,59 @@ public class SecurityConfig {
     }
 
     @Bean
-    BCryptPasswordEncoder passwordEncoder(){
+    BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public KeyPair keyPair(){
-        try{
-        var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(2048);
-        return keyPairGenerator.generateKeyPair();}catch(Exception e){
+    public KeyPair keyPair() {
+        try {
+            var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            return keyPairGenerator.generateKeyPair();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Bean
-    public RSAKey rsaKey(KeyPair keyPair){
-        return new RSAKey.Builder((RSAPublicKey)keyPair.getPublic())
-                    .privateKey(keyPair.getPrivate())
-                    .keyID(UUID.randomUUID().toString())
-                    .build();
+    public RSAKey rsaKey(KeyPair keyPair) {
+        return new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
+                .privateKey(keyPair.getPrivate())
+                .keyID(UUID.randomUUID().toString())
+                .build();
     }
 
     @Bean
-    public JWKSource<SecurityContext> jwkSource(RSAKey rsaKey){
+    public JWKSource<SecurityContext> jwkSource(RSAKey rsaKey) {
         var jwkSet = new JWKSet(rsaKey);
         return (jwkSelector, context) -> jwkSelector.select(jwkSet);
     }
+
     @Bean
-    public JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException{
+    public JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException {
         return NimbusJwtDecoder
-                        .withPublicKey(rsaKey.toRSAPublicKey())
-                        .build();  
+                .withPublicKey(rsaKey.toRSAPublicKey())
+                .build();
     }
 
-    @Bean JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource){
+    @Bean
+    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
         return new NimbusJwtEncoder(jwkSource);
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedMethods("*")
+                        .allowedOrigins("http://localhost:3000");
+            }
+        };
     }
 }

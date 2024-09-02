@@ -28,10 +28,18 @@ public class Front {
     }
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody Users user) {
-        // System.out.println(user);
-        // return new ResponseEntity<String>("hi",HttpStatus.OK);
         return new ResponseEntity<>(userService.verify(user),HttpStatus.OK);
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<? extends Object> postMethodName(@RequestBody Users user) {
+        user = userService.register(user);
+        if (user == null) {
+            return new ResponseEntity<>("Unable to create user",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
     
     
     
