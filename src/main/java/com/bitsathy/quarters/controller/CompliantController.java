@@ -24,10 +24,12 @@ public class CompliantController {
     private CompliantService compliantService;
 
     @GetMapping("/compliants")
+    @CrossOrigin
     public ResponseEntity<List<Compliant>> getCompliants(){
         return new ResponseEntity<>( compliantService.getAllCompliants(), HttpStatus.OK);
     }
     @GetMapping("/compliant/{id}")
+    @CrossOrigin
     public ResponseEntity<?> getCompliantById(@PathVariable Integer id) {
         Compliant compliant = compliantService.getCompliantById(id);
         if(compliant == null){
