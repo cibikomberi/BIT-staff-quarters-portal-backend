@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bitsathy.quarters.model.Compliant;
 import com.bitsathy.quarters.model.Faculty;
-import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.service.FacultyService;
 
 import org.springframework.web.bind.annotation.GetMapping;
