@@ -25,6 +25,7 @@ public class Guest {
     private int id;
     private String name;
     private String place;
+    private String createdBy;
 
     @JsonFormat(shape = Shape.STRING, pattern = "dd-MM-YYYY")
     private Date fromDate;

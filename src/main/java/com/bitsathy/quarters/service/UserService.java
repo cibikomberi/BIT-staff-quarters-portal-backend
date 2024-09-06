@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import com.bitsathy.quarters.model.LoginResponse;
+import com.bitsathy.quarters.model.UserPrincipal;
 import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.repo.UserRepo;
 
@@ -49,7 +50,8 @@ public class UserService {
     public LoginResponse verify(Users user) {
         Authentication auth = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-        user = userRepo.findByUsername(user.getUsername());
+                
+        user = ((UserPrincipal)auth.getPrincipal()).getUser();
         return new LoginResponse(user.getId(), user.getUsername(), createToken(auth),user.getRoles());
     }
 

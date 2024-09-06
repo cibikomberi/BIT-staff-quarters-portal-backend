@@ -18,6 +18,7 @@ public class Innmate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private int userId;
     private String name;
     private String relation;
     private int age;
