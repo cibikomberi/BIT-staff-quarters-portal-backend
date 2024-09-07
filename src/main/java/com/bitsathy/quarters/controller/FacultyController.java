@@ -13,15 +13,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bitsathy.quarters.model.Compliant;
 import com.bitsathy.quarters.model.Faculty;
 import com.bitsathy.quarters.service.FacultyService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
 
 @RestController
 @CrossOrigin
@@ -32,9 +29,17 @@ public class FacultyController {
     @GetMapping("/faculty")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Faculty> getFaculty() {
-        // System.out.println(username);
         return facultyService.getFaculty();
     }
+
+    // @GetMapping("/whoami")
+    // // @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    // public List<Faculty> whoAmI() {
+    //     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    //     Jwt a = (Jwt)authentication.getPrincipal();
+    //     System.out.println(a.getSubject());
+    //     return facultyService.getFaculty();
+    // }
 
     @GetMapping("/faculty/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
@@ -44,26 +49,26 @@ public class FacultyController {
         }
         return new ResponseEntity<>(faculty, HttpStatus.OK);
     }
-@GetMapping("/roles")
+
+    @GetMapping("/roles")
     public String getCurrentUserRoles() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
+
         if (authentication != null) {
+            System.out.println(authentication.getName());
             String roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.joining(", "));
-                    System.out.println(roles);
+            System.out.println(roles);
             return "Current user roles: " + roles;
         }
-        
         return "No authenticated user";
     }
+
     @PostMapping("/test")
-    public String postMethodName(@RequestBody Compliant ssid) {
-        System.out.println(ssid);
+    public String postMethodName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println((authentication.getDetails()));
         return "hi";
     }
-    
-    
-    
 }

@@ -44,7 +44,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request
-        .requestMatchers("login", "register").permitAll()
+        .requestMatchers("login", "register","test").permitAll()
         .anyRequest().authenticated());
         http.sessionManagement(session -> {
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -55,7 +55,6 @@ public class SecurityConfig {
         // http.headers(head -> )
         http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
         http.httpBasic();
-
         return http.build();
     }
 

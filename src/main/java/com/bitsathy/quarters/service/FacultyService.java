@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import com.bitsathy.quarters.model.Faculty;
 import com.bitsathy.quarters.repo.FacultyRepo;
 
-
-
 @Service
 public class FacultyService {
     @Autowired

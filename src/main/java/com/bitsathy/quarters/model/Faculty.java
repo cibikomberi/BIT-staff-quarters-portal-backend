@@ -20,11 +20,11 @@ public class Faculty {
     private String name;
     private String department;
     private String email;
-    private long phone;
+    private Long phone;
     private String designation;
     private String quartersNo;
     private String address;
-    private long aadhar;
+    private Long aadhar;
 
     // List<Integer> compliants;
     // List<Integer> innmates;

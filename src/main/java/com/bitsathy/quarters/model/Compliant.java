@@ -1,5 +1,7 @@
 package com.bitsathy.quarters.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,5 +26,7 @@ public class Compliant {
     private String status;
 
     private String issuedBy;
+    private LocalDateTime issuedOn;
+    private String availableTime;
     private String assignedTo;
 }

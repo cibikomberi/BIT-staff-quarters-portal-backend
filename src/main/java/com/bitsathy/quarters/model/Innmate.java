@@ -25,4 +25,5 @@ public class Innmate {
     private String bloodGroup;
     private long aadhar;
     private boolean isWorking;
+    private boolean isStaying;
 }

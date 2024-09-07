@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,33 +26,34 @@ public class CompliantController {
     private CompliantService compliantService;
 
     @GetMapping("/compliants")
-    @CrossOrigin
-    public ResponseEntity<List<Compliant>> getAllCompliants(){
-        return new ResponseEntity<>( compliantService.getAllCompliants(), HttpStatus.OK);
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<List<Compliant>> getAllCompliants() {
+        return new ResponseEntity<>(compliantService.getAllCompliants(), HttpStatus.OK);
     }
+
     @GetMapping("/compliants/{username}")
-    @CrossOrigin
-    public ResponseEntity<List<Compliant>> getAllCompliantsByUser(@PathVariable String username){
-        return new ResponseEntity<>( compliantService.getAllCompliantsByUser(username), HttpStatus.OK);
+    @PreAuthorize("hasAuthority('SCOPE_USER') and #username == authentication.name")
+    public ResponseEntity<List<Compliant>> getAllCompliantsByUser(@PathVariable String username) {
+        return new ResponseEntity<>(compliantService.getAllCompliantsByUser(username), HttpStatus.OK);
     }
+
     @GetMapping("/compliant/{id}")
-    @CrossOrigin
+    @PostAuthorize("returnObject.body == null || (hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_USER') and returnObject.body.issuedBy == authentication.name))")
     public ResponseEntity<?> getCompliantById(@PathVariable Integer id) {
         Compliant compliant = compliantService.getCompliantById(id);
-        if(compliant == null){
+        if (compliant == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(compliant, HttpStatus.OK);
     }
-    
 
     @PostMapping("/compliants")
-    public ResponseEntity<?> postMethodName(@RequestBody Compliant compliant) { 
+    @PreAuthorize("(hasAuthority('SCOPE_USER') or hasAuthority('SCOPE_ADMIN')) and #compliant.issuedBy == authentication.name")
+    public ResponseEntity<?> newCompliant(@RequestBody Compliant compliant) {
         try {
-            return new ResponseEntity<>(compliantService.addCompliant(compliant),HttpStatus.OK);
+            return new ResponseEntity<>(compliantService.addCompliant(compliant), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }       
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
-    
 }

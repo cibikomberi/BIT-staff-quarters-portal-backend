@@ -52,6 +52,7 @@ public class UserService {
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
                 
         UserDetails a = (UserDetails)auth.getPrincipal();
+        System.out.println(a);
         return new LoginResponse(user.getId(), user.getUsername(), createToken(auth),a.getAuthorities());
     }
 
@@ -61,5 +62,46 @@ public class UserService {
             return userRepo.save(user);
         }
         return null;
+    }
+
+    public Users whoAmI(String subject) {
+        Users user = userRepo.findByUsername(subject).orElse(new Users());
+        user.setPassword(null);
+        return user;
+    }
+
+    public void updateUser(Users user) throws Exception {
+        if (user.getId() == null) {
+            throw new Exception("User Id cannot be null");
+        }
+        Users existingUser = userRepo.findById(user.getId()).orElse(new Users());
+        if (user.getName() != null) {
+            existingUser.setName(user.getName());
+        }
+        if (user.getUsername() != null) {
+            existingUser.setUsername(user.getUsername());
+        }
+        if (user.getDetails().getAddress() != null) {
+            existingUser.getDetails().setAddress(user.getDetails().getAddress());
+        }
+        if (user.getDetails().getAadhar() != null) {
+            existingUser.getDetails().setAadhar(user.getDetails().getAadhar());
+        }
+        if (user.getDetails().getDepartment() != null) {
+            existingUser.getDetails().setDepartment(user.getDetails().getDepartment());
+        }
+        if (user.getDetails().getDesignation() != null) {
+            existingUser.getDetails().setDesignation(user.getDetails().getDesignation());
+        }
+        if (user.getDetails().getEmail() != null) {
+            existingUser.getDetails().setEmail(user.getDetails().getEmail());
+        }
+        if (user.getDetails().getPhone() != null) {
+            existingUser.getDetails().setPhone(user.getDetails().getPhone());
+        }
+        if (user.getDetails().getQuartersNo() != null) {
+            existingUser.getDetails().setQuartersNo(user.getDetails().getQuartersNo());
+        }
+        userRepo.save(existingUser);
     }
 }

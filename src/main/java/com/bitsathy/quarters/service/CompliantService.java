@@ -1,5 +1,6 @@
 package com.bitsathy.quarters.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class CompliantService {
         if (compliant.getStatus() == null) {
             compliant.setStatus("Initiated");
         }
+        compliant.setIssuedOn(LocalDateTime.now());
         return compliantRepo.save(compliant);
     }
 
