@@ -23,7 +23,15 @@ public class InnmateService {
         return innmateRepo.saveAll(innmates);
     }
 
-    public Innmate addInnmates(Innmate innmate) {
+    public Innmate addInnmates(Innmate innmate) throws Exception{
+        System.out.println(innmate.getUsername());
+        if (innmate.getUsername() == null) {
+            throw new Exception("User id cannot be null");
+        }
         return innmateRepo.save(innmate);
+    }
+
+    public List<Innmate> getInnmatesByUser(String username) {
+        return innmateRepo.findByUsername(username);
     }
 }

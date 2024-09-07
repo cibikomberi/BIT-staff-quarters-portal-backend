@@ -25,8 +25,13 @@ public class CompliantController {
 
     @GetMapping("/compliants")
     @CrossOrigin
-    public ResponseEntity<List<Compliant>> getCompliants(){
+    public ResponseEntity<List<Compliant>> getAllCompliants(){
         return new ResponseEntity<>( compliantService.getAllCompliants(), HttpStatus.OK);
+    }
+    @GetMapping("/compliants/{username}")
+    @CrossOrigin
+    public ResponseEntity<List<Compliant>> getAllCompliantsByUser(@PathVariable String username){
+        return new ResponseEntity<>( compliantService.getAllCompliantsByUser(username), HttpStatus.OK);
     }
     @GetMapping("/compliant/{id}")
     @CrossOrigin
@@ -40,8 +45,12 @@ public class CompliantController {
     
 
     @PostMapping("/compliants")
-    public Compliant postMethodName(@RequestBody Compliant compliant) {        
-        return compliantService.addCompliant(compliant);
+    public ResponseEntity<?> postMethodName(@RequestBody Compliant compliant) { 
+        try {
+            return new ResponseEntity<>(compliantService.addCompliant(compliant),HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }       
     }
     
 }

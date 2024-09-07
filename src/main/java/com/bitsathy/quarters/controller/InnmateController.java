@@ -3,8 +3,11 @@ package com.bitsathy.quarters.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,9 +31,19 @@ public class InnmateController {
         return innmateService.getInnmates();
     }
 
+    @GetMapping("/innmates/{username}")
+    public List<Innmate> getInnmatesByUser(@PathVariable String username){
+        return innmateService.getInnmatesByUser(username);
+    }
+
     @PostMapping("/innmates")
-    public Innmate addInnmates(@RequestBody Innmate  innmate) {
-        return innmateService.addInnmates(innmate);
+    public ResponseEntity<?> addInnmates(@RequestBody Innmate  innmate) {
+        try {
+            return new ResponseEntity<>(innmateService.addInnmates(innmate),HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+        
     }
 
     @PutMapping("/innmates")

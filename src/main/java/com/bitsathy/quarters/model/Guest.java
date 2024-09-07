@@ -2,9 +2,6 @@ package com.bitsathy.quarters.model;
 
 import java.sql.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,9 +24,6 @@ public class Guest {
     private String place;
     private String createdBy;
 
-    @JsonFormat(shape = Shape.STRING, pattern = "dd-MM-YYYY")
     private Date fromDate;
-    
-    @JsonFormat(shape = Shape.STRING, pattern = "dd-MM-YYYY")
     private Date toDate;
 }

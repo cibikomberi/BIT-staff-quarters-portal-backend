@@ -1,6 +1,8 @@
 package com.bitsathy.quarters.model;
 
 
+import java.util.Collection;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -8,5 +10,5 @@ public class LoginResponse {
     public String id;
     public String username;
     public String token;
-    public String roles;
+    public Collection<?> roles;
 }

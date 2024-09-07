@@ -24,7 +24,17 @@ public class CompliantService {
         return compliantRepo.findById(id).orElse(null);
     }
 
-    public Compliant addCompliant(Compliant compliant){
+    public Compliant addCompliant(Compliant compliant) throws Exception{
+        if (compliant.getIssuedBy() == null) {
+            throw new Exception("No compliant issuer name");
+        }
+        if (compliant.getStatus() == null) {
+            compliant.setStatus("Initiated");
+        }
         return compliantRepo.save(compliant);
+    }
+
+    public List<Compliant> getAllCompliantsByUser(String username) {
+        return compliantRepo.findByIssuedBy(username);
     }
 }

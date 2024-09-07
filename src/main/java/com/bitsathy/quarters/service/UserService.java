@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -14,7 +15,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import com.bitsathy.quarters.model.LoginResponse;
-import com.bitsathy.quarters.model.UserPrincipal;
 import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.repo.UserRepo;
 
@@ -51,8 +51,8 @@ public class UserService {
         Authentication auth = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
                 
-        user = ((UserPrincipal)auth.getPrincipal()).getUser();
-        return new LoginResponse(user.getId(), user.getUsername(), createToken(auth),user.getRoles());
+        UserDetails a = (UserDetails)auth.getPrincipal();
+        return new LoginResponse(user.getId(), user.getUsername(), createToken(auth),a.getAuthorities());
     }
 
     public Users register(Users user) {

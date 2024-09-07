@@ -1,11 +1,15 @@
 package com.bitsathy.quarters.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +30,7 @@ public class FacultyController {
     private FacultyService facultyService;
 
     @GetMapping("/faculty")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Faculty> getFaculty() {
         // System.out.println(username);
         return facultyService.getFaculty();
@@ -40,7 +44,20 @@ public class FacultyController {
         }
         return new ResponseEntity<>(faculty, HttpStatus.OK);
     }
-
+@GetMapping("/roles")
+    public String getCurrentUserRoles() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication != null) {
+            String roles = authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.joining(", "));
+                    System.out.println(roles);
+            return "Current user roles: " + roles;
+        }
+        
+        return "No authenticated user";
+    }
     @PostMapping("/test")
     public String postMethodName(@RequestBody Compliant ssid) {
         System.out.println(ssid);
