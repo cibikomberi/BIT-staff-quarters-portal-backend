@@ -27,6 +27,7 @@ public class Compliant {
 
     private String issuedBy;
     private LocalDateTime issuedOn;
+    private LocalDateTime resolvedOn;
     private String availableTime;
     private String assignedTo;
 }

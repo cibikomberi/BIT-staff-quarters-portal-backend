@@ -1,6 +1,7 @@
 package com.bitsathy.quarters.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import com.bitsathy.quarters.service.CompliantService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @CrossOrigin
@@ -29,6 +32,12 @@ public class CompliantController {
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<List<Compliant>> getAllCompliants() {
         return new ResponseEntity<>(compliantService.getAllCompliants(), HttpStatus.OK);
+    }
+
+    @GetMapping("/compliants/count")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<Map<String, Object>> getCompliantsCount() {
+        return new ResponseEntity<>(compliantService.getCompliantCount(), HttpStatus.OK);
     }
 
     @GetMapping("/compliants/{username}")
@@ -47,6 +56,11 @@ public class CompliantController {
         return new ResponseEntity<>(compliant, HttpStatus.OK);
     }
 
+    @GetMapping("/compliants/search")
+    public List<Compliant> searchCompliant(@RequestParam String param) {
+        return compliantService.searchCompliant(param);
+    }
+    
     @PostMapping("/compliants")
     @PreAuthorize("(hasAuthority('SCOPE_USER') or hasAuthority('SCOPE_ADMIN')) and #compliant.issuedBy == authentication.name")
     public ResponseEntity<?> newCompliant(@RequestBody Compliant compliant) {

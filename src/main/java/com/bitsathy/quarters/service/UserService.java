@@ -1,14 +1,17 @@
 package com.bitsathy.quarters.service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -53,7 +56,8 @@ public class UserService {
                 
         UserDetails a = (UserDetails)auth.getPrincipal();
         System.out.println(a);
-        return new LoginResponse(user.getId(), user.getUsername(), createToken(auth),a.getAuthorities());
+        Users b = userRepo.findByUsername(user.getUsername()).orElse(user);
+        return new LoginResponse(b.getId(), b.getUsername(),b.getName(), createToken(auth),a.getAuthorities());
     }
 
     public Users register(Users user) {
@@ -64,8 +68,16 @@ public class UserService {
         return null;
     }
 
-    public Users whoAmI(String subject) {
-        Users user = userRepo.findByUsername(subject).orElse(new Users());
+    public Users whoAmI() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt a = (Jwt)authentication.getPrincipal();
+        Users user = userRepo.findByUsername(a.getSubject()).orElse(new Users());
+        user.setPassword(null);
+        return user;
+    }
+
+    public Users whoIsThis(String id) {
+        Users user = userRepo.findById(id).orElse(new Users());
         user.setPassword(null);
         return user;
     }
@@ -104,4 +116,10 @@ public class UserService {
         }
         userRepo.save(existingUser);
     }
+
+    public List<Users> getUsers() {
+        return userRepo.findAll();
+    }
+
+    
 }
