@@ -16,6 +16,7 @@ import com.bitsathy.quarters.model.Innmate;
 import com.bitsathy.quarters.service.InnmateService;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @CrossOrigin
@@ -28,6 +29,11 @@ public class InnmateController {
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Innmate> getInnmates(){
         return innmateService.getInnmates();
+    }
+    
+    @GetMapping("/innmates/search")
+    public List<Innmate> searchInnmate(@RequestParam String keyword) {
+        return innmateService.searchInnmate(keyword);
     }
 
     @GetMapping("/innmates/{username}")

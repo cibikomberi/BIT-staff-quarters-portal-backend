@@ -34,4 +34,8 @@ public class InnmateService {
     public List<Innmate> getInnmatesByUser(String username) {
         return innmateRepo.findByUsername(username);
     }
+
+    public List<Innmate> searchInnmate(String keyword) {
+        return innmateRepo.searchInnmates(keyword);
+    }
 }

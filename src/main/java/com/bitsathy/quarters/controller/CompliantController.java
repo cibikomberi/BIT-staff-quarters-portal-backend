@@ -57,8 +57,8 @@ public class CompliantController {
     }
 
     @GetMapping("/compliants/search")
-    public List<Compliant> searchCompliant(@RequestParam String param) {
-        return compliantService.searchCompliant(param);
+    public List<Compliant> searchCompliant(@RequestParam String keyword) {
+        return compliantService.searchCompliant(keyword);
     }
     
     @PostMapping("/compliants")

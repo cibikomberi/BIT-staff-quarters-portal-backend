@@ -48,8 +48,7 @@ public class CompliantService {
         return compliantRepo.findByIssuedBy(username);
     }
 
-    public List<Compliant> searchCompliant(String param) {
-        System.out.println(param);
-        return compliantRepo.searchCompliants(param);
+    public List<Compliant> searchCompliant(String keyword) {
+        return compliantRepo.searchCompliants(keyword);
     }
 }
