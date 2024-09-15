@@ -81,7 +81,7 @@ public class CompliantController {
     
     @GetMapping("/compliants/handler/{username}/search")
     @PreAuthorize("hasAuthority('SCOPE_HANDLER')")
-    public List<Compliant> searchHandlerCompliant(@RequestParam String keyword, @PathVariable String username) {
+    public List<Compliant> searchHandlerCompliant(@RequestParam String keyword, @PathVariable Long username) {
         return compliantService.searchHandlerCompliant(keyword,username);
     }
 

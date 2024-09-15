@@ -64,7 +64,7 @@ public class CompliantService {
         return compliantRepo.findByAssignedTo_Id(id);
     }
 
-    public List<Compliant> searchHandlerCompliant(String keyword, String username) {
+    public List<Compliant> searchHandlerCompliant(String keyword, Long username) {
         return compliantRepo.searchHandlerCompliants(keyword, username);
     }
 }

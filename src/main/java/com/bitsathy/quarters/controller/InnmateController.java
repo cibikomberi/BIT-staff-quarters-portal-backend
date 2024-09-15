@@ -31,30 +31,33 @@ public class InnmateController {
         return innmateService.getInnmates();
     }
     
-//    @GetMapping("/innmates/search")
-//    public List<Innmate> searchInnmate(@RequestParam String keyword) {
-//        return innmateService.searchInnmate(keyword);
-//    }
+    @GetMapping("/innmates/search")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public List<Innmate> searchInnmate(@RequestParam String keyword) {
+        return innmateService.searchInnmate(keyword);
+    }
 
-//    @GetMapping("/innmates/{username}")
-//    @PreAuthorize("hasAuthority('SCOPE_USER') and #username == authentication.name")
-//    public List<Innmate> getInnmatesByUser(@PathVariable String username){
-//        return innmateService.getInnmatesByUser(username);
-//    }
+    @GetMapping("/innmates/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public List<Innmate> getInnmatesByUser(@PathVariable Long id){
+        return innmateService.getInnmatesByUser(id);
+    }
 
-    @PostMapping("/innmates")
-    @PreAuthorize("hasAuthority('SCOPE_USER') and #innmate.username == authentication.name")
-    public ResponseEntity<?> addInnmates(@RequestBody Innmate innmate) {
+    @PostMapping("/innmates/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public ResponseEntity<?> addInnmates(@RequestBody Innmate innmate,@PathVariable Long id) {
+        System.out.println(innmate);
+        System.out.println(id);
         try {
-            return new ResponseEntity<>(innmateService.addInnmates(innmate),HttpStatus.OK);
+            return new ResponseEntity<>(innmateService.addInnmates(innmate,id),HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/innmates/{username}")
-    @PreAuthorize("hasAuthority('SCOPE_USER') and #username == authentication.name")
-    public List<Innmate> updateInnmates(@RequestBody List<Innmate>  innmates,@PathVariable String username) {
+    @PutMapping("/innmates/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public List<Innmate> updateInnmates(@RequestBody List<Innmate>  innmates,@PathVariable Long id) {
         System.out.println(innmates);
         return innmateService.updateInnmates(innmates);
     }

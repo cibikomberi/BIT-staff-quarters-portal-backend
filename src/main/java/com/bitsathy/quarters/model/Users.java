@@ -1,6 +1,5 @@
 package com.bitsathy.quarters.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +24,6 @@ public class Users {
     private Long id;
     private String username;
     private String name;
-
 
     private String password;
     private String designation;

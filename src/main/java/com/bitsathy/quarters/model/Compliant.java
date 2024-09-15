@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class Compliant {
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
-    private Long compliantId;
+    private Long id;
     private String category;
     private String title;
     private String description;

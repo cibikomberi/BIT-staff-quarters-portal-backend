@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
@@ -17,8 +19,10 @@ import java.util.List;
 @Entity
 public class Handler extends Users {
 
+    @JsonIgnore
     @OneToMany(mappedBy = "assignedTo")
     private List<Compliant> compliants;
+
     private Integer activeCount;
     private String category;
 }
