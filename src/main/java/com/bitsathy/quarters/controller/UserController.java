@@ -27,6 +27,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody Users user) {
+        System.out.println(user);
         return new ResponseEntity<>(userService.verify(user),HttpStatus.OK);
     }
 
@@ -39,16 +40,16 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
     
-    @PutMapping("/update")
-    public ResponseEntity<? extends Object> updateUser(@RequestBody Users user) {
-        System.out.println(user);
-        try {
-            userService.updateUser(user);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+    // @PutMapping("/update")
+    // public ResponseEntity<? extends Object> updateUser(@RequestBody Users user) {
+    //     System.out.println(user);
+    //     try {
+    //         userService.updateUser(user);
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    //     }
+    //     return new ResponseEntity<>(HttpStatus.OK);
+    // }
 
     @GetMapping("/whoami")
     public Users whoAmI() { 
@@ -57,7 +58,8 @@ public class UserController {
 
     @GetMapping("/whoisthis/{id}")
     public Users whoIsThis(@PathVariable String id) {
-        return userService.whoIsThis(id);
+        // return userService.whoIsThis(id);
+        return null;
     }
 
     @GetMapping("/users")

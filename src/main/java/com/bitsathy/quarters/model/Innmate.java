@@ -1,10 +1,6 @@
 package com.bitsathy.quarters.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,13 +13,16 @@ import lombok.NoArgsConstructor;
 public class Innmate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String username;
+    private Long id;
     private String name;
     private String relation;
-    private int age;
+    private Integer age;
     private String bloodGroup;
-    private long aadhar;
-    private boolean isWorking;
-    private boolean isStaying;
+    private Long aadhar;
+    private Boolean isWorking;
+    private Boolean isStaying;
+
+    @ManyToOne
+    @JoinColumn(name = "faculty")
+    private Faculty faculty;
 }

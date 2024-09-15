@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.bitsathy.quarters.model.Users;
 
 @Repository
-public interface UserRepo extends JpaRepository<Users, String> {
+public interface UserRepo extends JpaRepository<Users, Long> {
 
     Optional<Users> findByUsername(String username);
     

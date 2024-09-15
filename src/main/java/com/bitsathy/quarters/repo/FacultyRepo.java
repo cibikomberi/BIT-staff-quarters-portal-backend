@@ -7,6 +7,6 @@ import com.bitsathy.quarters.model.Faculty;
 
 
 @Repository
-public interface FacultyRepo extends JpaRepository<Faculty, String>{
+public interface FacultyRepo extends JpaRepository<Faculty, Long>{
     
 }

@@ -1,30 +1,35 @@
 package com.bitsathy.quarters.model;
 
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Entity
+
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users")
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Users {
     @Id
-    // @GeneratedValue(strategy = GenerationType.IDENTITY)
-    String id;
-    String username;
-    String name;
-    @OneToOne(cascade = CascadeType.ALL)
-    Faculty details;
-    String password;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+    private String username;
+    private String name;
+
+
+    private String password;
+    private String designation;
+    private String email;
 
     private String roles;
 }

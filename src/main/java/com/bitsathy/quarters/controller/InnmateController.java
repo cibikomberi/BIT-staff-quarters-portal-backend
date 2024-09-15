@@ -31,16 +31,16 @@ public class InnmateController {
         return innmateService.getInnmates();
     }
     
-    @GetMapping("/innmates/search")
-    public List<Innmate> searchInnmate(@RequestParam String keyword) {
-        return innmateService.searchInnmate(keyword);
-    }
+//    @GetMapping("/innmates/search")
+//    public List<Innmate> searchInnmate(@RequestParam String keyword) {
+//        return innmateService.searchInnmate(keyword);
+//    }
 
-    @GetMapping("/innmates/{username}")
-    @PreAuthorize("hasAuthority('SCOPE_USER') and #username == authentication.name")
-    public List<Innmate> getInnmatesByUser(@PathVariable String username){
-        return innmateService.getInnmatesByUser(username);
-    }
+//    @GetMapping("/innmates/{username}")
+//    @PreAuthorize("hasAuthority('SCOPE_USER') and #username == authentication.name")
+//    public List<Innmate> getInnmatesByUser(@PathVariable String username){
+//        return innmateService.getInnmatesByUser(username);
+//    }
 
     @PostMapping("/innmates")
     @PreAuthorize("hasAuthority('SCOPE_USER') and #innmate.username == authentication.name")
@@ -52,9 +52,9 @@ public class InnmateController {
         }
     }
 
-    @PutMapping("/innmates")
-    @PreAuthorize("hasAuthority('SCOPE_USER') and #innmate.username == authentication.name")
-    public List<Innmate> updateInnmates(@RequestBody List<Innmate>  innmates) {
+    @PutMapping("/innmates/{username}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and #username == authentication.name")
+    public List<Innmate> updateInnmates(@RequestBody List<Innmate>  innmates,@PathVariable String username) {
         System.out.println(innmates);
         return innmateService.updateInnmates(innmates);
     }

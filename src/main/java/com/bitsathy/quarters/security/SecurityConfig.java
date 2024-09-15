@@ -40,21 +40,18 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request
-        .requestMatchers("login", "register","test").permitAll()
-        .anyRequest().authenticated());
+                .requestMatchers("login", "register", "test").permitAll()
+                .anyRequest().authenticated());
         http.sessionManagement(session -> {
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         });
-        // http.headers(head -> head.xssProtection(xss -> xss.disable()));
         http.csrf(csrf -> csrf.disable());
         http.cors(Customizer.withDefaults());
-        // http.headers(head -> )
         http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
-        http.httpBasic();
+        http.httpBasic(Customizer. withDefaults());
         return http.build();
     }
 
@@ -112,5 +109,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-    
+
 }

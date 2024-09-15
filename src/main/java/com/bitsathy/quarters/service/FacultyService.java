@@ -17,7 +17,7 @@ public class FacultyService {
         return facultyRepo.findAll();
     }
 
-    public Faculty getFacultyById(String id){
+    public Faculty getFacultyById(Long id){
         return facultyRepo.findById(id).orElse(null);
     }
 }

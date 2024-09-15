@@ -24,18 +24,15 @@ public class InnmateService {
     }
 
     public Innmate addInnmates(Innmate innmate) throws Exception{
-        System.out.println(innmate.getUsername());
-        if (innmate.getUsername() == null) {
-            throw new Exception("User id cannot be null");
-        }
+
         return innmateRepo.save(innmate);
     }
 
-    public List<Innmate> getInnmatesByUser(String username) {
-        return innmateRepo.findByUsername(username);
-    }
+//    public List<Innmate> getInnmatesByUser(String username) {
+//        return innmateRepo.findByUsername(username);
+//    }
 
-    public List<Innmate> searchInnmate(String keyword) {
-        return innmateRepo.searchInnmates(keyword);
-    }
+//    public List<Innmate> searchInnmate(String keyword) {
+//        return innmateRepo.searchInnmates(keyword);
+//    }
 }
