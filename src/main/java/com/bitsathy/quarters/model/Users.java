@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Lob;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,4 +37,14 @@ public class Users {
     Long phone;
 
     String roles;
+
+    @JsonIgnore
+    private String imageName;
+
+    @JsonIgnore
+    private String imageType;
+    
+    @Lob
+    @JsonIgnore
+    private byte[] profileImage;
 }

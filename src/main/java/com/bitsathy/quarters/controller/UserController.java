@@ -1,15 +1,18 @@
 package com.bitsathy.quarters.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bitsathy.quarters.model.Admin;
 import com.bitsathy.quarters.model.Faculty;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 
 
 @RestController
@@ -49,8 +53,10 @@ public class UserController {
 
     @PutMapping("/update/user/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
-    public Users updateFaculty(@RequestBody Faculty user, @PathVariable Long id){   
-        return userService.updateUser(user, id);
+    public Users updateFaculty(@RequestPart Faculty data, @RequestPart MultipartFile image, @PathVariable Long id) throws IOException{
+        System.out.println(data);  
+        System.out.println(image);  
+        return userService.updateUser(data, image, id);
     }
 
     @PutMapping("/update/admin/{id}")
@@ -87,6 +93,15 @@ public class UserController {
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Users> searchUsers(@RequestParam String keyword) {
         return userService.searchUsers(keyword);
+    }
+
+    @GetMapping("/users/{id}/image")
+    public ResponseEntity<byte[]> getImageByProductId(@PathVariable Long id) {
+        Users users = userService.getUser(id);
+        byte[] imageFile = users.getProfileImage();
+
+        return ResponseEntity.ok().contentType(MediaType.valueOf(users.getImageType())).body(imageFile);
+
     }
     
 }

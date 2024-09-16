@@ -1,5 +1,6 @@
 package com.bitsathy.quarters.service;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bitsathy.quarters.model.LoginResponse;
 import com.bitsathy.quarters.model.Users;
@@ -94,12 +96,29 @@ public class UserService {
         return userRepo.save(user);
     }
 
+    public Users updateUser(Users user, MultipartFile image, Long id) throws IOException{
+        Users existingUser = userRepo.findById(id).get();
+
+        user.setImageName(image.getOriginalFilename());
+        user.setImageType(image.getContentType());
+        user.setProfileImage(image.getBytes());
+
+        user.setPassword(existingUser.getPassword());
+        user.setRoles(existingUser.getRoles());
+        
+        return userRepo.save(user);
+    }
+
     public List<Users> getUsers() {
         return userRepo.findAll();
     }
 
     public List<Users> searchUsers(String keyword) {
         return userRepo.searchUsers(keyword);
+    }
+
+    public Users getUser(Long id) {
+        return userRepo.findById(id).orElse(null);
     }
 
 }
