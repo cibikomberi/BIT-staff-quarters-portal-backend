@@ -53,9 +53,7 @@ public class UserController {
 
     @PutMapping("/update/user/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
-    public Users updateFaculty(@RequestPart Faculty data, @RequestPart MultipartFile image, @PathVariable Long id) throws IOException{
-        System.out.println(data);  
-        System.out.println(image);  
+    public Users updateFaculty(@RequestPart Faculty data, @RequestPart(required=false) MultipartFile image, @PathVariable Long id) throws IOException{
         return userService.updateUser(data, image, id);
     }
 

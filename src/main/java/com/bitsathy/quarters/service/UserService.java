@@ -99,9 +99,11 @@ public class UserService {
     public Users updateUser(Users user, MultipartFile image, Long id) throws IOException{
         Users existingUser = userRepo.findById(id).get();
 
-        user.setImageName(image.getOriginalFilename());
-        user.setImageType(image.getContentType());
-        user.setProfileImage(image.getBytes());
+        if (image != null) {
+            user.setImageName(image.getOriginalFilename());
+            user.setImageType(image.getContentType());
+            user.setProfileImage(image.getBytes());            
+        }
 
         user.setPassword(existingUser.getPassword());
         user.setRoles(existingUser.getRoles());
