@@ -1,11 +1,14 @@
 package com.bitsathy.quarters.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,13 +24,16 @@ import lombok.experimental.SuperBuilder;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-    private String username;
-    private String name;
+    @SequenceGenerator(name = "user_seq",initialValue = 1,allocationSize = 1)
+    Long id;
+    String username;
+    String name;
 
-    private String password;
-    private String designation;
-    private String email;
+    @JsonIgnore
+    String password;
+    String designation;
+    String email;
+    Long phone;
 
-    private String roles;
+    String roles;
 }

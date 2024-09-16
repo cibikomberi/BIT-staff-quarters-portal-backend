@@ -35,7 +35,7 @@ public class Compliant {
     private Faculty issuedBy;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "assigned_to")
+    @JoinColumn(name = "assigned_to",nullable = false)
     private Handler assignedTo;
 
     private LocalDateTime issuedOn;

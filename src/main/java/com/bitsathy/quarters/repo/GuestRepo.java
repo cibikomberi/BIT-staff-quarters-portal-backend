@@ -5,8 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import com.bitsathy.quarters.model.Guest;
 
+import java.util.List;
+
 
 @Repository
-public interface GuestRepo extends JpaRepository<Guest, Integer> {
-    
+public interface GuestRepo extends JpaRepository<Guest, Long> {
+    List<Guest> findByFaculty_Id(Long id);
 }

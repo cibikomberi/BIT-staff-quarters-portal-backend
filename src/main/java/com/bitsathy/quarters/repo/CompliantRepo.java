@@ -11,13 +11,7 @@ import com.bitsathy.quarters.model.Compliant;
 @Repository
 public interface CompliantRepo extends JpaRepository<Compliant, Integer> {
 
-
-//     @Query("SELECT c FROM Complaint c WHERE c.issuedBy = :id")
-// List<Compliant> findAllComplaintsByFaculty(@Param("id") Long id);
-
-// List<Compliant> findByIssuedBy(Long issuedBy);
-
-List<Compliant> findByIssuedBy_Id(Long id);
+    List<Compliant> findByIssuedBy_Id(Long id);
 
     List<Compliant> findByAssignedTo_Id(Long assignedTo);
 

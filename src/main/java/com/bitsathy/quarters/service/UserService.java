@@ -54,16 +54,15 @@ public class UserService {
                 .collect(Collectors.joining(" "));
     }
 
-    public LoginResponse verify(Users user) {
-        System.out.println(user);
+    public LoginResponse verify(String username, String password) {
         Authentication auth = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(username, password));
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Users b = userRepo.findByUsername(user.getUsername()).orElse(user);
-        return new LoginResponse(b.getId(), b.getUsername(), b.getName(), createToken(auth, b.getId()),
-                userDetails.getAuthorities());
+        Users user = userRepo.findByUsername(username).get();
+        return new LoginResponse(user.getId(), username, user.getName(), createToken(auth, user.getId()), userDetails.getAuthorities());
     }
 
+    // TODO
     public Users register(Users user) {
         if (userRepo.findByUsername(user.getUsername()) == null) {
             user.setPassword(encoder.encode(user.getPassword()));
@@ -74,56 +73,33 @@ public class UserService {
 
     public Users whoAmI() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt a = (Jwt) authentication.getPrincipal();
-        Users user = userRepo.findByUsername(a.getSubject()).orElse(new Users());
-        user.setPassword(null);
-        System.out.println(user);
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        Users user = userRepo.findById((Long) jwt.getClaims().get("id")).get();
+
         return user;
     }
 
     public Users whoIsThis(Long id) {
-        Users user = userRepo.findById(id).orElse(new Users());
-        user.setPassword(null);
+        Users user = userRepo.findById(id).get();
         return user;
     }
 
-    // public void updateUser(Users user) throws Exception {
-    // if (user.getId() == null) {
-    // throw new Exception("User Id cannot be null");
-    // }
-    // Users existingUser = userRepo.findById(user.getId()).orElse(new Users());
-    // if (user.getName() != null) {
-    // existingUser.setName(user.getName());
-    // }
-    // if (user.getUsername() != null) {
-    // existingUser.setUsername(user.getUsername());
-    // }
-    // if (user.getDetails().getAddress() != null) {
-    // existingUser.getDetails().setAddress(user.getDetails().getAddress());
-    // }
-    // if (user.getDetails().getAadhar() != null) {
-    // existingUser.getDetails().setAadhar(user.getDetails().getAadhar());
-    // }
-    // if (user.getDetails().getDepartment() != null) {
-    // existingUser.getDetails().setDepartment(user.getDetails().getDepartment());
-    // }
-    // if (user.getDetails().getDesignation() != null) {
-    // existingUser.getDetails().setDesignation(user.getDetails().getDesignation());
-    // }
-    // if (user.getDetails().getEmail() != null) {
-    // existingUser.getDetails().setEmail(user.getDetails().getEmail());
-    // }
-    // if (user.getDetails().getPhone() != null) {
-    // existingUser.getDetails().setPhone(user.getDetails().getPhone());
-    // }
-    // if (user.getDetails().getQuartersNo() != null) {
-    // existingUser.getDetails().setQuartersNo(user.getDetails().getQuartersNo());
-    // }
-    // userRepo.save(existingUser);
-    // }
+    public Users updateUser(Users user, Long id){
+        Users existingUser = userRepo.findById(id).get();
+
+        user.setPassword(existingUser.getPassword());
+        user.setRoles(existingUser.getRoles());
+        
+        return userRepo.save(user);
+    }
 
     public List<Users> getUsers() {
         return userRepo.findAll();
+    }
+
+    public List<Users> searchUsers(String keyword) {
+        return userRepo.searchUsers(keyword);
     }
 
 }

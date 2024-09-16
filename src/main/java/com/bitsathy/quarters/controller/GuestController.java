@@ -1,6 +1,7 @@
 package com.bitsathy.quarters.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import com.bitsathy.quarters.model.Guest;
 import com.bitsathy.quarters.service.GuestService;
@@ -8,10 +9,6 @@ import com.bitsathy.quarters.service.GuestService;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @CrossOrigin
@@ -21,14 +18,20 @@ public class GuestController {
     private GuestService guestService;
 
     @GetMapping("/guests")
-    public List<Guest> getGuests() {
-        return guestService.getGuests();
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public List<Guest> getAllGuests(){
+        return guestService.getAllGuests();
+    }
+    
+    @GetMapping("/guests/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public List<Guest> getGuests(@PathVariable Long id) {
+        return guestService.getGuests(id);
     }
 
-    @PostMapping("/guests")
-    public List<Guest> postMethodName(@RequestBody List<Guest> guests) {
-        return guestService.addGuests(guests);
+    @PostMapping("/guests/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public List<Guest> postMethodName(@RequestBody List<Guest> guests,@PathVariable Long id) {
+        return guestService.addGuests(guests,id);
     }
-    
-    
 }

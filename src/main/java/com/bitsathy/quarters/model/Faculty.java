@@ -21,7 +21,8 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "faculty")
 public class Faculty extends Users{
 
-    private Long phone;
+    private String facultyId;
+    private String department;
     private String designation;
     private String quartersNo;
     private String address;

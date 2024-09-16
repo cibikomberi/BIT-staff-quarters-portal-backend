@@ -23,6 +23,6 @@ public class Innmate {
     private Boolean isStaying;
 
     @ManyToOne
-    @JoinColumn(name = "faculty")
+    @JoinColumn(name = "faculty", nullable = false)
     private Faculty faculty;
 }

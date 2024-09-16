@@ -23,6 +23,6 @@ public class Guest {
     private Date toDate;
 
     @ManyToOne()
-    @JoinColumn(name = "faculty")
+    @JoinColumn(name = "faculty", nullable = false)
     private Faculty faculty;
 }

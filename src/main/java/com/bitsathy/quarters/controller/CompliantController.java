@@ -3,9 +3,7 @@ package com.bitsathy.quarters.controller;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bitsathy.quarters.model.Compliant;
-import com.bitsathy.quarters.security.JwtUtils;
 import com.bitsathy.quarters.service.CompliantService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,7 +52,6 @@ public class CompliantController {
         return new ResponseEntity<>(compliantService.getAllCompliantsByHandler(id), HttpStatus.OK);
     }
 
-    // TODO
     @GetMapping("/compliants/handler/count/{id}")
     @PreAuthorize("hasAuthority('SCOPE_HANDLER')")
     @CrossOrigin
