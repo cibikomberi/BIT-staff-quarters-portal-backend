@@ -2,15 +2,7 @@ package com.bitsathy.quarters.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.Lob;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,13 +31,8 @@ public class Users {
 
     String roles;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "image")
     @JsonIgnore
-    private String imageName;
-
-    @JsonIgnore
-    private String imageType;
-
-    @Lob
-    @JsonIgnore
-    private byte[] profileImage;
+    Image image;
 }

@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bitsathy.quarters.model.Image;
 import com.bitsathy.quarters.model.LoginResponse;
 import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.repo.UserRepo;
@@ -100,9 +101,12 @@ public class UserService {
         Users existingUser = userRepo.findById(id).get();
 
         if (image != null) {
-            user.setImageName(image.getOriginalFilename());
-            user.setImageType(image.getContentType());
-            user.setProfileImage(image.getBytes());            
+            Image image1 = new Image();
+            image1.setImageName(image.getOriginalFilename());
+            image1.setImageType(image.getContentType());
+            image1.setProfileImage(image.getBytes());
+            user.setImage(image1);
+            System.out.println("image set");
         }
 
         user.setPassword(existingUser.getPassword());

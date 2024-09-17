@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bitsathy.quarters.model.Admin;
 import com.bitsathy.quarters.model.Faculty;
 import com.bitsathy.quarters.model.Handler;
+import com.bitsathy.quarters.model.Image;
 import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.service.UserService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -94,12 +97,14 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}/image")
-    public ResponseEntity<byte[]> getImageByProductId(@PathVariable Long id) {
+    @Transactional(readOnly = true)
+    public ResponseEntity<byte[]> getProfileImage(@PathVariable Long id) {
         Users users = userService.getUser(id);
-        byte[] imageFile = users.getProfileImage();
+        Image image = users.getImage();
+        if (image == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        byte[] imageFile = image.getProfileImage();
 
-        return ResponseEntity.ok().contentType(MediaType.valueOf(users.getImageType())).body(imageFile);
-
+        return ResponseEntity.ok().contentType(MediaType.valueOf(image.getImageType())).body(imageFile);
     }
     
 }
