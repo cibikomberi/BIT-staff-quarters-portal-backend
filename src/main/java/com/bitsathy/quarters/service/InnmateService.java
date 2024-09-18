@@ -44,4 +44,14 @@ public class InnmateService {
     public List<Innmate> searchInnmate(String keyword) {
         return innmateRepo.searchInnmates(keyword);
     }
+
+    public void innmatesCheckout(List<Long> innmates, Long facultyId) {
+        Faculty faculty = facultyRepo.findById(facultyId).get();
+        innmates.forEach(id -> {
+            Innmate innmate = innmateRepo.findById(id).get();
+            if (innmate.getFaculty().getId() == facultyId) {
+                innmateRepo.delete(innmate);
+            }
+        });
+    }
 }

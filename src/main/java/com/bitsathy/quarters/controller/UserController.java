@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bitsathy.quarters.model.Admin;
 import com.bitsathy.quarters.model.Faculty;
 import com.bitsathy.quarters.model.Handler;
-import com.bitsathy.quarters.model.Image;
 import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.service.UserService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -45,13 +43,16 @@ public class UserController {
         return new ResponseEntity<>(userService.verify(username, password), HttpStatus.OK);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Users user) {
-        user = userService.register(user);
-        if (user == null) {
-            return new ResponseEntity<>("Unable to create user", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
+    @PostMapping("/register/user")
+    public Users registerUser(@RequestPart Faculty data, @RequestPart(required=false) MultipartFile image) throws IOException {
+        data.setRoles("USER");
+        return userService.register(data, image);
+    }
+
+    @PostMapping("/register/handler")
+    public Users registerHandler(@RequestPart Handler data, @RequestPart(required=false) MultipartFile image) throws IOException {
+        data.setRoles("HANDLER");
+        return userService.register(data, image);
     }
 
     @PutMapping("/update/user/{id}")
@@ -62,15 +63,16 @@ public class UserController {
 
     @PutMapping("/update/admin/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public Users updateAdmin(@RequestBody Admin user, @PathVariable Long id){
-        return userService.updateUser(user, id);
+    public Users updateAdmin(@RequestPart Admin data, @RequestPart(required=false) MultipartFile image, @PathVariable Long id) throws IOException{
+        System.out.println("admin update");
+        return userService.updateUser(data, image, id);
 
     }
 
     @PutMapping("/update/handler/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_HANDLER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
-    public Users updateHandler(@RequestBody Handler user, @PathVariable Long id){
-        return userService.updateUser(user, id);
+    public Users updateHandler(@RequestPart Handler data, @RequestPart(required=false) MultipartFile image, @PathVariable Long id) throws IOException{
+        return userService.updateUser(data, image, id);
 
     }
 
@@ -96,15 +98,10 @@ public class UserController {
         return userService.searchUsers(keyword);
     }
 
-    @GetMapping("/users/{id}/image")
+    @GetMapping("/users/image/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<byte[]> getProfileImage(@PathVariable Long id) {
-        Users users = userService.getUser(id);
-        Image image = users.getImage();
-        if (image == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        byte[] imageFile = image.getProfileImage();
-
-        return ResponseEntity.ok().contentType(MediaType.valueOf(image.getImageType())).body(imageFile);
+        return userService.getProfilePic(id);
     }
     
 }

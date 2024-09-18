@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.bitsathy.quarters.model.Compliant;
 
 @Repository
-public interface CompliantRepo extends JpaRepository<Compliant, Integer> {
+public interface CompliantRepo extends JpaRepository<Compliant, Long> {
 
     List<Compliant> findByIssuedBy_Id(Long id);
 
@@ -24,9 +24,18 @@ public interface CompliantRepo extends JpaRepository<Compliant, Integer> {
     @Query(value = "SELECT COUNT(*) FROM compliant WHERE DATE(issued_on) = CURRENT_DATE", nativeQuery = true)
     Long countIssuedComplaintsToday();
 
-    @Query(value = "SELECT COUNT(*) FROM compliant WHERE status = 'Initiated' or status = 'Pending'", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM compliant WHERE status = 'Initiated' or status = 'Ongoing'", nativeQuery = true)
     Long countPendingComplaints();
 
     @Query(value = "SELECT COUNT(*) FROM compliant WHERE DATE(resolved_on) = CURRENT_DATE", nativeQuery = true)
     Long countResolvedComplaintsToday();
+
+    @Query("SELECT count(c) FROM Compliant c JOIN c.assignedTo h WHERE h.id = :id")
+    Long countIssuedComplaintsHandler(Long id);
+
+    @Query("SELECT count(c) FROM Compliant c JOIN c.assignedTo h WHERE h.id = :id AND c.status = 'Issued'")
+    Long countPendingComplaintsHandler(Long id);
+
+    @Query("SELECT count(c) FROM Compliant c JOIN c.assignedTo h WHERE h.id = :id AND c.status = 'Resolved'")
+    Long countResolvedComplaintsHandler(Long id);
 }

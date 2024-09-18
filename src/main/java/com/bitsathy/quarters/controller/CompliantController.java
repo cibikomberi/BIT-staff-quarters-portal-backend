@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bitsathy.quarters.model.Compliant;
 import com.bitsathy.quarters.service.CompliantService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +47,12 @@ public class CompliantController {
         return new ResponseEntity<>(compliantService.getAllCompliantsByUser(id), HttpStatus.OK);
     }
 
+    @PostMapping("/compliants/{id}/updateStatus")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or hasAuthority('SCOPE_HANDLER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public void updateCompliantStatus(@PathVariable Long id, @RequestBody ObjectNode json) {
+        compliantService.updateService(id, json.get("status").asText());
+    }
+
     @GetMapping("/compliants/handler/{id}")
     @PreAuthorize("hasAuthority('SCOPE_HANDLER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
     public ResponseEntity<List<Compliant>> getAllCompliantsByHandler(@PathVariable Long id) {
@@ -54,14 +61,13 @@ public class CompliantController {
 
     @GetMapping("/compliants/handler/count/{id}")
     @PreAuthorize("hasAuthority('SCOPE_HANDLER')")
-    @CrossOrigin
     public ResponseEntity<Map<String, Object>> getHandlerCompliantsCount(@PathVariable Long id) {
-        return new ResponseEntity<>(compliantService.getCompliantCount(), HttpStatus.OK);
+        return new ResponseEntity<>(compliantService.getHandlerCompliantCount(id), HttpStatus.OK);
     }
 
     @GetMapping("/compliant/{id}")
     @PostAuthorize("returnObject.body == null or (hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_USER') and returnObject.body.issuedBy.id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)) or (hasAuthority('SCOPE_HANDLER') and returnObject.body.assignedTo.id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
-    public ResponseEntity<?> getCompliantById(@PathVariable Integer id) {
+    public ResponseEntity<?> getCompliantById(@PathVariable Long id) {
         Compliant compliant = compliantService.getCompliantById(id);
         if (compliant == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

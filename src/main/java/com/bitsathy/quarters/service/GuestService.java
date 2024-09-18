@@ -28,4 +28,13 @@ public class GuestService {
         guests.forEach(guest -> guest.setFaculty(faculty));
         return guestRepo.saveAll(guests);
     }
+
+    public void guestCheckout(Long guestId, Long id) {
+        Guest guest = guestRepo.findById(guestId).get();
+        if (guest.getFaculty().getId() == id) {
+            guestRepo.delete(guest);
+            return;
+        }
+        throw new RuntimeException("Invalid arguments");
+    }
 }

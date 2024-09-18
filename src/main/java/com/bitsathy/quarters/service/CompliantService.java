@@ -37,7 +37,15 @@ public class CompliantService {
         return response;
     }
 
-    public Compliant getCompliantById(int id) {
+    public Map<String, Object> getHandlerCompliantCount(Long id) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("issued", compliantRepo.countIssuedComplaintsHandler(id));
+        response.put("pending", compliantRepo.countPendingComplaintsHandler(id));
+        response.put("resolved", compliantRepo.countResolvedComplaintsHandler(id));
+        return response;
+    }
+
+    public Compliant getCompliantById(Long id) {
         return compliantRepo.findById(id).orElse(null);
     }
 
@@ -78,5 +86,33 @@ public class CompliantService {
 
     public List<Compliant> searchHandlerCompliant(String keyword, Long username) {
         return compliantRepo.searchHandlerCompliants(keyword, username);
+    }
+
+    public void updateService(Long id, String status) {
+        Compliant compliant = compliantRepo.findById(id).get();
+
+        if (status.equals("Accept")) {
+            if (compliant.getStatus().equals("Initiated")) {
+                compliant.setStatus("Ongoing");
+                compliantRepo.save(compliant);
+                return;
+            }
+        }
+        if (status.equals("Reject")) {
+            if (compliant.getStatus().equals("Initiated")) {
+                compliant.setStatus("Rejected");
+                compliantRepo.save(compliant);
+                return;
+            }
+        }
+        if (status.equals("Completed")) {
+            if (compliant.getStatus().equals("Ongoing")) {
+                compliant.setStatus("Completed");
+                compliant.setResolvedOn(LocalDateTime.now());
+                compliantRepo.save(compliant);
+                return;
+            }
+        }
+        throw new RuntimeException("Invalid status");
     }
 }

@@ -27,10 +27,10 @@ public class InnmateController {
 
     @GetMapping("/innmates")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public List<Innmate> getInnmates(){
+    public List<Innmate> getInnmates() {
         return innmateService.getInnmates();
     }
-    
+
     @GetMapping("/innmates/search")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Innmate> searchInnmate(@RequestParam String keyword) {
@@ -39,26 +39,32 @@ public class InnmateController {
 
     @GetMapping("/innmates/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public List<Innmate> getInnmatesByUser(@PathVariable Long id){
+    public List<Innmate> getInnmatesByUser(@PathVariable Long id) {
         return innmateService.getInnmatesByUser(id);
     }
 
     @PostMapping("/innmates/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public ResponseEntity<?> addInnmates(@RequestBody Innmate innmate,@PathVariable Long id) {
+    public ResponseEntity<?> addInnmates(@RequestBody Innmate innmate, @PathVariable Long id) {
         System.out.println(innmate);
         System.out.println(id);
         try {
-            return new ResponseEntity<>(innmateService.addInnmates(innmate,id),HttpStatus.OK);
+            return new ResponseEntity<>(innmateService.addInnmates(innmate, id), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/innmates/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public List<Innmate> updateInnmates(@RequestBody List<Innmate>  innmates,@PathVariable Long id) {
+    public List<Innmate> updateInnmates(@RequestBody List<Innmate> innmates, @PathVariable Long id) {
         System.out.println(innmates);
         return innmateService.updateInnmates(innmates);
+    }
+
+    @PostMapping("/innmates/checkout/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public void innmatesCheckout(@RequestBody List<Long> innmates, @PathVariable Long id) {
+        innmateService.innmatesCheckout(innmates, id);
     }
 }

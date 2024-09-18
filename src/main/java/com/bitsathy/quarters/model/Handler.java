@@ -22,6 +22,6 @@ public class Handler extends Users {
     @OneToMany(mappedBy = "assignedTo")
     private List<Compliant> compliants;
 
-    private Integer activeCount;
+    private Integer activeCount = 0;
     private String category;
 }

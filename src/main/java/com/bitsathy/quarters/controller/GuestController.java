@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.bitsathy.quarters.model.Guest;
 import com.bitsathy.quarters.service.GuestService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 
@@ -33,5 +34,11 @@ public class GuestController {
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
     public List<Guest> postMethodName(@RequestBody List<Guest> guests,@PathVariable Long id) {
         return guestService.addGuests(guests,id);
+    }
+
+    @PostMapping("/guests/checkout/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public void guestCheckout(@PathVariable Long id, @RequestBody ObjectNode json) {
+        guestService.guestCheckout(json.get("guestId").asLong(), id);
     }
 }

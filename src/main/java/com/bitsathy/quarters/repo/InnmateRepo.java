@@ -10,7 +10,7 @@ import com.bitsathy.quarters.model.Innmate;
 
 
 @Repository
-public interface InnmateRepo extends JpaRepository<Innmate, Integer>{
+public interface InnmateRepo extends JpaRepository<Innmate, Long>{
     @Query("SELECT i FROM Innmate i JOIN i.faculty f WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(i.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(i.relation) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(i.bloodGroup) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Innmate> searchInnmates(String keyword);
 }
