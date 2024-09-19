@@ -48,7 +48,7 @@ public class CompliantController {
     }
 
     @PostMapping("/compliants/{id}/updateStatus")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or hasAuthority('SCOPE_HANDLER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or hasAuthority('SCOPE_HANDLER')")
     public void updateCompliantStatus(@PathVariable Long id, @RequestBody ObjectNode json) {
         compliantService.updateService(id, json.get("status").asText());
     }

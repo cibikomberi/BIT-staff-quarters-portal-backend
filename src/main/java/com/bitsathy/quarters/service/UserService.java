@@ -1,10 +1,10 @@
 package com.bitsathy.quarters.service;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -71,16 +71,20 @@ public class UserService {
                 userDetails.getAuthorities());
     }
 
-    public Users register(Users user, MultipartFile image) throws IOException {
+    public Users register(Users user, MultipartFile image, String password) throws Exception {
         user.setId(null);
-        user.setPassword(encoder.encode("1234"));
-
+        user.setPassword(encoder.encode(password));
+        
+        if (! EmailValidator.getInstance().isValid(user.getEmail())) {
+            throw new Exception("Email is invalid");
+        }
+        
         if (image != null) {
             Image image1 = new Image();
             image1.setImageName(image.getOriginalFilename());
             image1.setImageType(image.getContentType());
             image1.setProfileImage(image.getBytes());
-            user.setImage(image1);
+            user.setImage(imageRepo.save(image1));
         }
 
         return userRepo.save(user);
@@ -100,9 +104,12 @@ public class UserService {
         return user;
     }
 
-    public Users updateUser(Users user, MultipartFile image, Long id) throws IOException {
+    public Users updateUser(Users user, MultipartFile image, Long id) throws Exception {
         Users existingUser = userRepo.findById(id).get();
 
+        if (! EmailValidator.getInstance().isValid(user.getEmail())) {
+            throw new Exception("Email is invalid");
+        }
         if (image != null) {
             Image image1 = new Image();
             image1.setImageName(image.getOriginalFilename());
@@ -151,6 +158,12 @@ public class UserService {
         Image defaultImage = imageRepo.findById(1L).get();
         return ResponseEntity.ok().contentType(MediaType.valueOf(defaultImage.getImageType()))
                 .body(defaultImage.getProfileImage());
+    }
+
+    public void changePassword(Long id, String newPassword) {
+        Users user = userRepo.findById(id).get();
+        user.setPassword(encoder.encode(newPassword));
+        userRepo.save(user);
     }
 
 }

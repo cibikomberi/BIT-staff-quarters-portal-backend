@@ -46,7 +46,6 @@ public class InnmateService {
     }
 
     public void innmatesCheckout(List<Long> innmates, Long facultyId) {
-        Faculty faculty = facultyRepo.findById(facultyId).get();
         innmates.forEach(id -> {
             Innmate innmate = innmateRepo.findById(id).get();
             if (innmate.getFaculty().getId() == facultyId) {
