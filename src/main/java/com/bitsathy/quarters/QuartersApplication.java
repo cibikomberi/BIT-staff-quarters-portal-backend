@@ -9,7 +9,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class QuartersApplication {
 
-	// TODO : CHANGE PASSWORD
+	// TODO : UPDATE ACTIVE COUNT
+	// TODO : Designation in user update
+	// TODO : USERNAME must be unique
 	public static void main(String[] args) {
 		SpringApplication.run(QuartersApplication.class, args);
 	}

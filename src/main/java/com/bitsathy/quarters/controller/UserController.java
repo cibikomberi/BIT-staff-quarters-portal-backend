@@ -21,13 +21,11 @@ import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.service.UserService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-
 
 @RestController
 @CrossOrigin
@@ -44,58 +42,67 @@ public class UserController {
     }
 
     @PostMapping("/register/user")
-    public ResponseEntity<?> registerUser(@RequestPart Faculty data, @RequestPart(required=false) MultipartFile image, @RequestPart String password) throws IOException {
-        data.setRoles("USER");
-        System.out.println("hih");
+    public ResponseEntity<?> registerUser(@RequestPart Faculty data, @RequestPart(required = false) MultipartFile image,
+            @RequestPart String password) throws IOException {
         try {
-            return new ResponseEntity<>(userService.register(data, image, password), HttpStatus.OK) ;
+            userService.verifyFaculty(data);
+            data.setRoles("USER");
+            return new ResponseEntity<>(userService.register(data, image, password), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST) ;
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+
     }
 
     @PostMapping("/register/handler")
-    public ResponseEntity<?> registerHandler(@RequestPart Handler data, @RequestPart(required=false) MultipartFile image, @RequestPart String password) throws IOException {
-        data.setRoles("HANDLER");
-        System.out.println("hih");
+    public ResponseEntity<?> registerHandler(@RequestPart Handler data,
+            @RequestPart(required = false) MultipartFile image, @RequestPart(required = false) String password) throws IOException {
         try {
-            return new ResponseEntity<>(userService.register(data, image, password), HttpStatus.OK) ;
+            userService.verifyHandler(data);
+            data.setRoles("HANDLER");
+            return new ResponseEntity<>(userService.register(data, image, password), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST) ;
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/update/user/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
-    public ResponseEntity<?> updateFaculty(@RequestPart Faculty data, @RequestPart(required=false) MultipartFile image, @PathVariable Long id) throws IOException{
+    public ResponseEntity<?> updateFaculty(@RequestPart Faculty data,
+            @RequestPart(required = false) MultipartFile image, @PathVariable Long id) throws IOException {
         try {
-            return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK) ;
+            userService.verifyFaculty(data);
+            data.setRoles("USER");
+            return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST) ;
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/update/admin/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<?> updateAdmin(@RequestPart Admin data, @RequestPart(required=false) MultipartFile image, @PathVariable Long id) throws IOException{
-        System.out.println("admin update");
+    public ResponseEntity<?> updateAdmin(@RequestPart Admin data, @RequestPart(required = false) MultipartFile image,
+            @PathVariable Long id) throws IOException {
         try {
-            return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK) ;
+            userService.verifyAdmin(data);
+            data.setRoles("ADMIN");
+            return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST) ;
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @PutMapping("/update/handler/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_HANDLER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
-    public ResponseEntity<?> updateHandler(@RequestPart Handler data, @RequestPart(required=false) MultipartFile image, @PathVariable Long id) throws IOException{
+    public ResponseEntity<?> updateHandler(@RequestPart Handler data,
+            @RequestPart(required = false) MultipartFile image, @PathVariable Long id) throws IOException {
         try {
-            return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK) ;
+            userService.verifyHandler(data);
+            data.setRoles("HANDLER");
+            return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST) ;
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @GetMapping("/whoami")
@@ -104,6 +111,7 @@ public class UserController {
     }
 
     @GetMapping("/whoisthis/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public Users whoIsThis(@PathVariable Long id) {
         return userService.whoIsThis(id);
     }
@@ -116,8 +124,12 @@ public class UserController {
 
     @PostMapping("users/changePassword/{id}")
     @PreAuthorize("#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)")
-    public void changePassword(@PathVariable Long id, @RequestBody ObjectNode json) {
-        userService.changePassword(id, json.get("password").asText());
+    public ResponseEntity<?> changePassword(@PathVariable Long id, @RequestBody ObjectNode json) {
+        try {
+            return new ResponseEntity<>(userService.changePassword(id, json.get("password").asText()), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/users/search")
@@ -131,7 +143,6 @@ public class UserController {
     public ResponseEntity<byte[]> getProfileImage(@PathVariable Long id) {
         return userService.getProfilePic(id);
     }
-    
 }
 
 record JwtResponse(String token) {

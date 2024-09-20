@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @RestController
 @CrossOrigin
 public class CompliantController {
@@ -37,35 +36,11 @@ public class CompliantController {
 
     @GetMapping("/compliants/count")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<Map<String, Object>> getCompliantsCount() {
+    public ResponseEntity<Map<String, Long>> getCompliantsCount() {
         return new ResponseEntity<>(compliantService.getCompliantCount(), HttpStatus.OK);
     }
 
-    @GetMapping("/compliants/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public ResponseEntity<List<Compliant>> getAllCompliantsByUser(@PathVariable Long id) {
-        return new ResponseEntity<>(compliantService.getAllCompliantsByUser(id), HttpStatus.OK);
-    }
-
-    @PostMapping("/compliants/{id}/updateStatus")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or hasAuthority('SCOPE_HANDLER')")
-    public void updateCompliantStatus(@PathVariable Long id, @RequestBody ObjectNode json) {
-        compliantService.updateService(id, json.get("status").asText());
-    }
-
-    @GetMapping("/compliants/handler/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_HANDLER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public ResponseEntity<List<Compliant>> getAllCompliantsByHandler(@PathVariable Long id) {
-        return new ResponseEntity<>(compliantService.getAllCompliantsByHandler(id), HttpStatus.OK);
-    }
-
-    @GetMapping("/compliants/handler/count/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_HANDLER')")
-    public ResponseEntity<Map<String, Object>> getHandlerCompliantsCount(@PathVariable Long id) {
-        return new ResponseEntity<>(compliantService.getHandlerCompliantCount(id), HttpStatus.OK);
-    }
-
-    @GetMapping("/compliant/{id}")
+    @GetMapping("/compliants/{id}") // TODO
     @PostAuthorize("returnObject.body == null or (hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_USER') and returnObject.body.issuedBy.id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)) or (hasAuthority('SCOPE_HANDLER') and returnObject.body.assignedTo.id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
     public ResponseEntity<?> getCompliantById(@PathVariable Long id) {
         Compliant compliant = compliantService.getCompliantById(id);
@@ -75,27 +50,54 @@ public class CompliantController {
         return new ResponseEntity<>(compliant, HttpStatus.OK);
     }
 
+    @GetMapping("/compliants/user/{id}") // TODO
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public ResponseEntity<List<Compliant>> getAllCompliantsByUser(@PathVariable Long id) {
+        return new ResponseEntity<>(compliantService.getAllCompliantsByUser(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/compliants/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public ResponseEntity<?> newCompliant(@RequestBody Compliant compliant, @PathVariable Long id) {
+        try {
+            return new ResponseEntity<>(compliantService.newCompliant(compliant, id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/compliants/handler/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_HANDLER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public ResponseEntity<List<Compliant>> getAllCompliantsByHandler(@PathVariable Long id) {
+        return new ResponseEntity<>(compliantService.getAllCompliantsByHandler(id), HttpStatus.OK);
+    }
+    
+    @GetMapping("/compliants/handler/count/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_HANDLER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
+    public ResponseEntity<Map<String, Long>> getHandlerCompliantsCount(@PathVariable Long id) {
+        return new ResponseEntity<>(compliantService.getHandlerCompliantCount(id), HttpStatus.OK);
+    }
+    
     @GetMapping("/compliants/search")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Compliant> searchCompliant(@RequestParam String keyword) {
         return compliantService.searchCompliant(keyword);
     }
     
-    @GetMapping("/compliants/handler/{username}/search")
+    @GetMapping("/compliants/handler/{id}/search")
     @PreAuthorize("hasAuthority('SCOPE_HANDLER')")
-    public List<Compliant> searchHandlerCompliant(@RequestParam String keyword, @PathVariable Long username) {
-        return compliantService.searchHandlerCompliant(keyword,username);
+    public List<Compliant> searchHandlerCompliant(@RequestParam String keyword, @PathVariable Long id) {
+        return compliantService.searchHandlerCompliant(keyword, id);
     }
-
-    @PostMapping("/compliants/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public ResponseEntity<?> newCompliant(@RequestBody Compliant compliant,@PathVariable Long id) {
-        System.out.println(id);
-        System.out.println(compliant);
+    
+    @PostMapping("/compliants/{id}/updateStatus") // TODO
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or hasAuthority('SCOPE_HANDLER')") //TODO
+    public ResponseEntity<?> updateCompliantStatus(@PathVariable Long id, @RequestBody ObjectNode json) {
         try {
-            return new ResponseEntity<>(compliantService.newCompliant(compliant,id), HttpStatus.OK);
+            compliantService.updateService(id, json.get("status").asText());
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
     }
 }

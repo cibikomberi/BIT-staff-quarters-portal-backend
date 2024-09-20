@@ -46,8 +46,6 @@ public class InnmateController {
     @PostMapping("/innmates/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
     public ResponseEntity<?> addInnmates(@RequestBody Innmate innmate, @PathVariable Long id) {
-        System.out.println(innmate);
-        System.out.println(id);
         try {
             return new ResponseEntity<>(innmateService.addInnmates(innmate, id), HttpStatus.OK);
         } catch (Exception e) {
@@ -57,9 +55,12 @@ public class InnmateController {
 
     @PutMapping("/innmates/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public List<Innmate> updateInnmates(@RequestBody List<Innmate> innmates, @PathVariable Long id) {
-        System.out.println(innmates);
-        return innmateService.updateInnmates(innmates);
+    public ResponseEntity<?> updateInnmates(@RequestBody List<Innmate> innmates, @PathVariable Long id) {
+        try {
+            return new ResponseEntity<>(innmateService.updateInnmates(innmates), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/innmates/checkout/{id}")

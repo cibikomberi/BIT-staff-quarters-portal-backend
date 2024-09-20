@@ -1,6 +1,7 @@
 package com.bitsathy.quarters.service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -19,26 +20,29 @@ import com.bitsathy.quarters.repo.HandlerRepo;
 @Service
 public class CompliantService {
 
+    public static List<String> categories = Arrays.asList("Plumbing", "Electrical", "Carpentering", "Gardening", "Others");
+
     @Autowired
     private CompliantRepo compliantRepo;
-
     @Autowired
     private HandlerRepo handlerRepo;
 
+    //Return all compliants
     public List<Compliant> getAllCompliants() {
         return compliantRepo.findAll();
     }
 
-    public Map<String, Object> getCompliantCount() {
-        Map<String, Object> response = new HashMap<>();
+    // Returns compliant counts for admin
+    public Map<String, Long> getCompliantCount() {
+        Map<String, Long> response = new HashMap<>();
         response.put("issued", compliantRepo.countIssuedComplaintsToday());
         response.put("pending", compliantRepo.countPendingComplaints());
         response.put("resolved", compliantRepo.countResolvedComplaintsToday());
         return response;
     }
 
-    public Map<String, Object> getHandlerCompliantCount(Long id) {
-        Map<String, Object> response = new HashMap<>();
+    public Map<String, Long> getHandlerCompliantCount(Long id) {
+        Map<String, Long> response = new HashMap<>();
         response.put("issued", compliantRepo.countIssuedComplaintsHandler(id));
         response.put("pending", compliantRepo.countPendingComplaintsHandler(id));
         response.put("resolved", compliantRepo.countResolvedComplaintsHandler(id));
@@ -51,12 +55,28 @@ public class CompliantService {
 
     public Compliant newCompliant(Compliant compliant, Long id) throws Exception {
 
-        if (compliant.getStatus() == null) {
-            compliant.setStatus("Initiated");
+        compliant.setStatus("Initiated");
+
+        // Verify all fields
+        if (!categories.contains(compliant.getCategory())) {
+            throw new Exception("Category is invalid");
         }
+        if (compliant.getTitle() == null || compliant.getTitle().trim().equals("")) {
+            throw new Exception("Invalid title");
+        }
+        if (compliant.getDescription() == null || compliant.getDescription().trim().equals("")) {
+            throw new Exception("Please provide description");
+        }
+        if (compliant.getAvailableTime() == null || compliant.getAvailableTime().trim().equals("")) {
+            compliant.setAvailableTime("Anytime");
+        }
+
+        // Create a dummy faculty with same id 
+        // instead of hitting db for fetching faculty
         Faculty issuedBy = Faculty.builder().id(id).build();
         compliant.setIssuedBy(issuedBy);
 
+        // Assign compliant to handler with minimum active count
         Handler handlerWithMinCount = handlerRepo.findByCategory(compliant.getCategory())
                 .stream()
                 .min(Comparator.comparing(Handler::getActiveCount))
@@ -67,6 +87,7 @@ public class CompliantService {
 
         compliant.setAssignedTo(handlerWithMinCount);
 
+        // Set current time
         compliant.setIssuedOn(LocalDateTime.now());
         return compliantRepo.save(compliant);
     }
@@ -88,7 +109,7 @@ public class CompliantService {
         return compliantRepo.searchHandlerCompliants(keyword, username);
     }
 
-    public void updateService(Long id, String status) {
+    public void updateService(Long id, String status) throws Exception {
         Compliant compliant = compliantRepo.findById(id).get();
 
         if (status.equals("Accept")) {
@@ -113,6 +134,6 @@ public class CompliantService {
                 return;
             }
         }
-        throw new RuntimeException("Invalid status");
+        throw new Exception("Invalid status");
     }
 }

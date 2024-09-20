@@ -1,5 +1,8 @@
 package com.bitsathy.quarters.service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import com.bitsathy.quarters.model.Faculty;
@@ -23,18 +26,51 @@ public class GuestService {
         return guestRepo.findByFaculty_Id(id);
     }
 
-    public List<Guest> addGuests(List<Guest> guests,Long id){
+    public List<Guest> addGuests(List<Guest> guests,Long id) throws Exception{
+
+        // Create a dummy faculty with same id 
+        // instead of hitting db for fetching faculty
         Faculty faculty = Faculty.builder().id(id).build();
-        guests.forEach(guest -> guest.setFaculty(faculty));
+
+        Date lowerBound = new GregorianCalendar(2020, Calendar.JANUARY, 1).getTime();
+        Date upperBound = new GregorianCalendar(2050, Calendar.DECEMBER, 31).getTime();
+
+        for(Guest guest : guests) {
+
+            // Verify fields
+            System.out.println(guest.getFromDate());
+            System.out.println(guest.getToDate());
+            System.out.println(lowerBound);
+            System.out.println(upperBound);
+            if (guest.getName() == null || guest.getName().trim().equals("")) {
+                throw new Exception("Invalid guest name");
+            }
+            if (guest.getPlace() == null || guest.getPlace().trim().equals("")) {
+                throw new Exception("Invalid place");
+            }
+            if (guest.getFromDate() == null || !(guest.getFromDate().after(lowerBound)  && guest.getFromDate().before(upperBound))) {
+                throw new Exception("From date is out of range");
+            }
+            if (guest.getToDate() == null || !(guest.getToDate().after(lowerBound)  && guest.getToDate().before(upperBound))) {
+                throw new Exception("To date is out of range");
+            }
+            if (guest.getToDate().before(guest.getFromDate())) {
+                throw new Exception("To date is before from date");
+            }
+
+            // Set dummy faculty to each guest
+            guest.setFaculty(faculty);
+        }
+
         return guestRepo.saveAll(guests);
     }
 
-    public void guestCheckout(Long guestId, Long id) {
+    public String guestCheckout(Long guestId, Long id) throws Exception {
         Guest guest = guestRepo.findById(guestId).get();
         if (guest.getFaculty().getId() == id) {
             guestRepo.delete(guest);
-            return;
+            return "Ok";
         }
-        throw new RuntimeException("Invalid arguments");
+        throw new Exception("Invalid arguments");
     }
 }

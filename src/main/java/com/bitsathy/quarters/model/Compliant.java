@@ -2,6 +2,8 @@ package com.bitsathy.quarters.model;
 
 import java.time.LocalDateTime;
 
+
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +28,9 @@ public class Compliant {
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long id;
     private String category;
+
     private String title;
+
     private String description;
     private String status;
 
@@ -42,5 +46,4 @@ public class Compliant {
     private LocalDateTime resolvedOn;
 
     private String availableTime;
-
 }

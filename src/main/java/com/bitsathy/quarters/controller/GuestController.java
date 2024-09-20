@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @CrossOrigin
@@ -32,13 +34,21 @@ public class GuestController {
 
     @PostMapping("/guests/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public List<Guest> postMethodName(@RequestBody List<Guest> guests,@PathVariable Long id) {
-        return guestService.addGuests(guests,id);
+    public ResponseEntity<?> postMethodName(@RequestBody List<Guest> guests,@PathVariable Long id) {
+        try {
+            return new ResponseEntity<>(guestService.addGuests(guests, id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/guests/checkout/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
-    public void guestCheckout(@PathVariable Long id, @RequestBody ObjectNode json) {
-        guestService.guestCheckout(json.get("guestId").asLong(), id);
+    public ResponseEntity<?> guestCheckout(@PathVariable Long id, @RequestBody ObjectNode json) {
+        try {
+            return new ResponseEntity<>(guestService.guestCheckout(json.get("guestId").asLong(), id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }

@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-
 @Data
 @SuperBuilder
 @AllArgsConstructor
@@ -39,6 +38,7 @@ public class Users {
     @Column(nullable = false)
     String roles;
     
+    @Column(nullable = false)
     String designation;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)

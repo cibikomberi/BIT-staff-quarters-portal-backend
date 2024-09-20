@@ -18,7 +18,7 @@ public interface CompliantRepo extends JpaRepository<Compliant, Long> {
     @Query("SELECT c FROM Compliant c JOIN c.issuedBy f JOIN c.assignedTo h WHERE LOWER(c.category) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(c.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(h.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR CAST(c.id AS string)  LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Compliant> searchCompliants(String keyword);
 
-    @Query("SELECT c FROM Compliant c JOIN c.issuedBy f JOIN c.assignedTo h WHERE h.id = :id AND (LOWER(c.category) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(c.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR CAST(c.id AS string)  LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    @Query("SELECT c FROM Compliant c JOIN c.issuedBy f JOIN c.assignedTo h WHERE h.id = :id AND (LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(c.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR CAST(c.id AS string)  LIKE LOWER(CONCAT('%', :keyword, '%')))")
     List<Compliant> searchHandlerCompliants(String keyword, Long id);
 
     @Query(value = "SELECT COUNT(*) FROM compliant WHERE DATE(issued_on) = CURRENT_DATE", nativeQuery = true)
