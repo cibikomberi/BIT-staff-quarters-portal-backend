@@ -39,4 +39,8 @@ public class Faculty extends Users{
     @JsonIgnore
     @OneToMany(mappedBy = "faculty", fetch = FetchType.LAZY)
     private List<Innmate> innmates;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "faculty", fetch = FetchType.LAZY)
+    private List<Checkouts> checkouts;
 }

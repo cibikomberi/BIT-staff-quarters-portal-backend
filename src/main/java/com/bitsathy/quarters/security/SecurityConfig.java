@@ -49,7 +49,9 @@ public class SecurityConfig {
         });
         http.csrf(csrf -> csrf.disable());
         http.cors(Customizer.withDefaults());
-        http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+
+        // @SuppressWarnings("removal")
+        http.oauth2ResourceServer( OAuth2ResourceServerConfigurer::jwt);
         http.httpBasic(Customizer. withDefaults());
         return http.build();
     }

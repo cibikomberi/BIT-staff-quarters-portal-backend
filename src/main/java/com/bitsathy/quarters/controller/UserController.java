@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bitsathy.quarters.model.Admin;
 import com.bitsathy.quarters.model.Faculty;
 import com.bitsathy.quarters.model.Handler;
+import com.bitsathy.quarters.model.Security;
 import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.service.UserService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -99,6 +100,19 @@ public class UserController {
         try {
             userService.verifyHandler(data);
             data.setRoles("HANDLER");
+            return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/update/security/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_SECURITY') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
+    public ResponseEntity<?> updateSecurity(@RequestPart Security data,
+            @RequestPart(required = false) MultipartFile image, @PathVariable Long id) throws IOException {
+        try {
+            userService.verifySecurity(data);
+            data.setRoles("SECURITY");
             return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

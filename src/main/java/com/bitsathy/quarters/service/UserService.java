@@ -26,6 +26,7 @@ import com.bitsathy.quarters.model.Faculty;
 import com.bitsathy.quarters.model.Handler;
 import com.bitsathy.quarters.model.Image;
 import com.bitsathy.quarters.model.LoginResponse;
+import com.bitsathy.quarters.model.Security;
 import com.bitsathy.quarters.model.Users;
 import com.bitsathy.quarters.repo.ImageRepo;
 import com.bitsathy.quarters.repo.UserRepo;
@@ -264,6 +265,12 @@ public class UserService {
         if (admin.getDepartment() == null || admin.getDepartment().trim().equals("")) {
             throw new Exception("Department cannot be empty");
         }
+
+        return true;
+    }
+
+    public boolean verifySecurity(Security security) throws Exception {
+        verifyUser(security);
 
         return true;
     }
