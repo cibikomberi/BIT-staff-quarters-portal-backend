@@ -46,6 +46,9 @@ public class UserService {
     private AuthenticationManager authenticationManager;
 
     public boolean isStrongPassword(String password) {
+        if (password == null) {
+            return false;
+        }
         int digit = 0;
         int special = 0;
         int upCount = 0;
@@ -105,8 +108,10 @@ public class UserService {
 
     public Users register(Users user, MultipartFile image, String password) throws Exception {
         user.setId(null);
-
-        if (isStrongPassword(password)) {
+        if (userRepo.existsByUsername(user.getUsername())) {
+            throw new Exception("Username must be unique");
+        }
+        if (!isStrongPassword(password)) {
             throw new Exception("Weak password");
         }
         user.setPassword(encoder.encode(password));
@@ -118,6 +123,30 @@ public class UserService {
             image1.setProfileImage(image.getBytes());
             user.setImage(imageRepo.save(image1));
         }
+
+        return userRepo.save(user);
+    }
+
+    public Users updateUser(Users user, MultipartFile image, Long id) throws Exception {
+        Users existingUser = userRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User is not present"));
+
+        if ((!existingUser.getUsername().equals(user.getUsername())) && userRepo.existsByUsername(user.getUsername())) {
+            throw new Exception("Username must be unique");
+        }
+
+        if (image != null) {
+            Image image1 = new Image();
+            image1.setImageName(image.getOriginalFilename());
+            image1.setImageType(image.getContentType());
+            image1.setProfileImage(image.getBytes());
+            user.setImage(image1);
+        } else {
+            user.setImage(existingUser.getImage());
+        }
+
+        user.setPassword(existingUser.getPassword());
+        user.setRoles(existingUser.getRoles());
 
         return userRepo.save(user);
     }
@@ -134,27 +163,6 @@ public class UserService {
     public Users whoIsThis(Long id) {
         Users user = userRepo.findById(id).get();
         return user;
-    }
-
-    public Users updateUser(Users user, MultipartFile image, Long id) throws Exception {
-        Users existingUser = userRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User is not present"));
-
-        if (image != null) {
-            Image image1 = new Image();
-            image1.setImageName(image.getOriginalFilename());
-            image1.setImageType(image.getContentType());
-            image1.setProfileImage(image.getBytes());
-            user.setImage(image1);
-        } else {
-            user.setImage(existingUser.getImage());
-        }
-
-        user.setPassword(existingUser.getPassword());
-        user.setRoles(existingUser.getRoles());
-
-        System.out.println(user.getDesignation());
-        return userRepo.save(user);
     }
 
     public List<Users> getUsers() {
@@ -203,7 +211,7 @@ public class UserService {
         return "Ok";
     }
 
-    private boolean verifyUser(Users user) throws Exception {
+    public boolean verifyUser(Users user) throws Exception {
         if (user.getName() == null || user.getName().trim().equals("")) {
             throw new Exception("Name cannot be empty");
         }
@@ -242,7 +250,8 @@ public class UserService {
         if (faculty.getAddress() == null || faculty.getAddress().trim().equals("")) {
             throw new Exception("Address cannot be empty");
         }
-        if (faculty.getAadhar() == null || !(faculty.getAadhar() > 100000000000L && faculty.getAadhar() < 999999999999L)) {
+        if (faculty.getAadhar() == null
+                || !(faculty.getAadhar() > 100000000000L && faculty.getAadhar() < 999999999999L)) {
             throw new Exception("Invalid aadhar");
         }
 
@@ -261,10 +270,6 @@ public class UserService {
 
     public boolean verifyAdmin(Admin admin) throws Exception {
         verifyUser(admin);
-
-        if (admin.getDepartment() == null || admin.getDepartment().trim().equals("")) {
-            throw new Exception("Department cannot be empty");
-        }
 
         return true;
     }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +50,8 @@ public class UserController {
             userService.verifyFaculty(data);
             data.setRoles("USER");
             return new ResponseEntity<>(userService.register(data, image, password), HttpStatus.OK);
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMostSpecificCause().getMessage().split("Detail:")[1], HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -57,11 +60,44 @@ public class UserController {
 
     @PostMapping("/register/handler")
     public ResponseEntity<?> registerHandler(@RequestPart Handler data,
-            @RequestPart(required = false) MultipartFile image, @RequestPart(required = false) String password) throws IOException {
+            @RequestPart(required = false) MultipartFile image, @RequestPart(required = false) String password)
+            throws IOException {
         try {
             userService.verifyHandler(data);
             data.setRoles("HANDLER");
             return new ResponseEntity<>(userService.register(data, image, password), HttpStatus.OK);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMostSpecificCause().getMessage().split("Detail:")[1], HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/register/admin")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<?> registerAdmin(@RequestPart Admin data, @RequestPart String password)
+            throws IOException {
+        try {
+            userService.verifyUser(data);
+            data.setRoles("ADMIN");
+            return new ResponseEntity<>(userService.register(data, null, password), HttpStatus.OK);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMostSpecificCause().getMessage().split("Detail:")[1], HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/register/security")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<?> registerSecurity(@RequestPart Security data,@RequestPart String password)
+            throws IOException {
+        try {
+            userService.verifyUser(data);
+            data.setRoles("SECURITY");
+            return new ResponseEntity<>(userService.register(data, null, password), HttpStatus.OK);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMostSpecificCause().getMessage().split("Detail:")[1], HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -75,6 +111,8 @@ public class UserController {
             userService.verifyFaculty(data);
             data.setRoles("USER");
             return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMostSpecificCause().getMessage().split("Detail:")[1], HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -88,6 +126,8 @@ public class UserController {
             userService.verifyAdmin(data);
             data.setRoles("ADMIN");
             return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMostSpecificCause().getMessage().split("Detail:")[1], HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -101,6 +141,8 @@ public class UserController {
             userService.verifyHandler(data);
             data.setRoles("HANDLER");
             return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMostSpecificCause().getMessage().split("Detail:")[1], HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -114,6 +156,8 @@ public class UserController {
             userService.verifySecurity(data);
             data.setRoles("SECURITY");
             return new ResponseEntity<>(userService.updateUser(data, image, id), HttpStatus.OK);
+        }catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMostSpecificCause().getMessage().split("Detail:")[1], HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -136,7 +180,7 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @PostMapping("users/changePassword/{id}")
+    @PostMapping("/users/changePassword/{id}")
     @PreAuthorize("#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)")
     public ResponseEntity<?> changePassword(@PathVariable Long id, @RequestBody ObjectNode json) {
         try {

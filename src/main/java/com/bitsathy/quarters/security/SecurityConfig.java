@@ -21,7 +21,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -41,7 +40,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request
-        .requestMatchers("register/**").permitAll()
+                .requestMatchers("register/user").permitAll()
+                .requestMatchers("register/handler").permitAll()
                 .requestMatchers("login").permitAll()
                 .anyRequest().authenticated());
         http.sessionManagement(session -> {
@@ -50,9 +50,8 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.cors(Customizer.withDefaults());
 
-        // @SuppressWarnings("removal")
-        http.oauth2ResourceServer( OAuth2ResourceServerConfigurer::jwt);
-        http.httpBasic(Customizer. withDefaults());
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+        http.httpBasic(Customizer.withDefaults());
         return http.build();
     }
 

@@ -56,10 +56,27 @@ public class InnmateService {
         return innmateRepo.findAll();
     }
 
-    public List<Innmate> updateInnmates(List<Innmate> innmates) throws Exception {
+    public List<Innmate> updateInnmates(List<Innmate> innmates, Long id) throws Exception {
 
         for (Innmate innmate : innmates) {
             verifyInnmateDetails(innmate);
+            if (innmate.getId() == null) {
+                throw new Exception("Innmate id is not present");
+            }
+            if (innmate.getFaculty().getId() != id) {
+                throw new Exception("Faculty id is not valid");
+            }
+        }
+
+        Faculty faculty = facultyRepo.findById(id).get();
+        for (Innmate innmate : innmates) {
+            if (!(faculty.getInnmates()
+                .stream()
+                .anyMatch(existingInnmate -> 
+                        existingInnmate.getId()
+                        .equals(innmate.getId())))) {
+                            throw new Exception("Innmate id is not matching with faculty");
+            }
         }
         return innmateRepo.saveAll(innmates);
     }
@@ -68,6 +85,7 @@ public class InnmateService {
 
         verifyInnmateDetails(innmate);
 
+        // Create dummy faculty with same id
         Faculty faculty = Faculty.builder().id(id).build();
         innmate.setFaculty(faculty);
 

@@ -20,14 +20,15 @@ import com.bitsathy.quarters.repo.HandlerRepo;
 @Service
 public class CompliantService {
 
-    public static List<String> categories = Arrays.asList("Plumbing", "Electrical", "Carpentering", "Gardening", "Others");
+    public static List<String> categories = Arrays.asList("Plumbing", "Electrical", "Carpentering", "Gardening",
+            "Others");
 
     @Autowired
     private CompliantRepo compliantRepo;
     @Autowired
     private HandlerRepo handlerRepo;
 
-    //Return all compliants
+    // Return all compliants
     public List<Compliant> getAllCompliants() {
         return compliantRepo.findAll();
     }
@@ -71,7 +72,7 @@ public class CompliantService {
             compliant.setAvailableTime("Anytime");
         }
 
-        // Create a dummy faculty with same id 
+        // Create a dummy faculty with same id
         // instead of hitting db for fetching faculty
         Faculty issuedBy = Faculty.builder().id(id).build();
         compliant.setIssuedBy(issuedBy);
@@ -81,7 +82,7 @@ public class CompliantService {
                 .stream()
                 .min(Comparator.comparing(Handler::getActiveCount))
                 .orElseThrow(() -> new RuntimeException("No Handlers Available"));
-                
+
         handlerWithMinCount.setActiveCount(handlerWithMinCount.getActiveCount() + 1);
         handlerRepo.save(handlerWithMinCount);
 
@@ -105,8 +106,8 @@ public class CompliantService {
         return compliantRepo.findByAssignedTo_Id(id);
     }
 
-    public List<Compliant> searchHandlerCompliant(String keyword, Long username) {
-        return compliantRepo.searchHandlerCompliants(keyword, username);
+    public List<Compliant> searchHandlerCompliant(String keyword, Long id) {
+        return compliantRepo.searchHandlerCompliants(keyword, id);
     }
 
     public void updateService(Long id, String status) throws Exception {
@@ -123,6 +124,10 @@ public class CompliantService {
             if (compliant.getStatus().equals("Initiated")) {
                 compliant.setStatus("Rejected");
                 compliantRepo.save(compliant);
+
+                Handler handler = compliant.getAssignedTo();
+                handler.setActiveCount(handler.getActiveCount() - 1);
+                handlerRepo.save(handler);
                 return;
             }
         }
@@ -130,6 +135,11 @@ public class CompliantService {
             if (compliant.getStatus().equals("Ongoing")) {
                 compliant.setStatus("Completed");
                 compliant.setResolvedOn(LocalDateTime.now());
+
+                Handler handler = compliant.getAssignedTo();
+                handler.setActiveCount(handler.getActiveCount() - 1);
+                handlerRepo.save(handler);
+                
                 compliantRepo.save(compliant);
                 return;
             }

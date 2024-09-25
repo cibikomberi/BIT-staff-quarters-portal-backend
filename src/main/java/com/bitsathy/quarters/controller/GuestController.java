@@ -26,13 +26,13 @@ public class GuestController {
         return guestService.getAllGuests();
     }
     
-    @GetMapping("/guests/{id}")
+    @GetMapping("/guests/user/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
     public List<Guest> getGuests(@PathVariable Long id) {
         return guestService.getGuests(id);
     }
 
-    @PostMapping("/guests/{id}")
+    @PostMapping("/guests/user/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
     public ResponseEntity<?> postMethodName(@RequestBody List<Guest> guests,@PathVariable Long id) {
         try {

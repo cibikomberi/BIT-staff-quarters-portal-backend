@@ -39,7 +39,7 @@ public class CheckoutController {
     }
 
     @GetMapping("/checkouts/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_USER') and #id = T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)")
+    @PreAuthorize("hasAuthority('SCOPE_USER') and #id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)")
     public List<Checkouts> getAllCheckoutsByUser(@PathVariable Long id) {
         return checkoutService.getAllCheckoutsByUser(id);
     }

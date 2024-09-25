@@ -40,7 +40,7 @@ public class CompliantController {
         return new ResponseEntity<>(compliantService.getCompliantCount(), HttpStatus.OK);
     }
 
-    @GetMapping("/compliants/{id}") // TODO
+    @GetMapping("/compliants/{id}")
     @PostAuthorize("returnObject.body == null or (hasAuthority('SCOPE_ADMIN') or (hasAuthority('SCOPE_USER') and returnObject.body.issuedBy.id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)) or (hasAuthority('SCOPE_HANDLER') and returnObject.body.assignedTo.id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication)))")
     public ResponseEntity<?> getCompliantById(@PathVariable Long id) {
         Compliant compliant = compliantService.getCompliantById(id);
@@ -50,13 +50,13 @@ public class CompliantController {
         return new ResponseEntity<>(compliant, HttpStatus.OK);
     }
 
-    @GetMapping("/compliants/user/{id}") // TODO
+    @GetMapping("/compliants/user/{id}")
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
     public ResponseEntity<List<Compliant>> getAllCompliantsByUser(@PathVariable Long id) {
         return new ResponseEntity<>(compliantService.getAllCompliantsByUser(id), HttpStatus.OK);
     }
 
-    @PostMapping("/compliants/{id}")
+    @PostMapping("/compliants/user/{id}") 
     @PreAuthorize("hasAuthority('SCOPE_USER') and (#id == T(com.bitsathy.quarters.security.JwtUtils).getUserIdFromToken(authentication))")
     public ResponseEntity<?> newCompliant(@RequestBody Compliant compliant, @PathVariable Long id) {
         try {
@@ -90,8 +90,8 @@ public class CompliantController {
         return compliantService.searchHandlerCompliant(keyword, id);
     }
     
-    @PostMapping("/compliants/{id}/updateStatus") // TODO
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or hasAuthority('SCOPE_HANDLER')") //TODO
+    @PostMapping("/compliants/{id}/updateStatus") 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or hasAuthority('SCOPE_HANDLER')")
     public ResponseEntity<?> updateCompliantStatus(@PathVariable Long id, @RequestBody ObjectNode json) {
         try {
             compliantService.updateService(id, json.get("status").asText());

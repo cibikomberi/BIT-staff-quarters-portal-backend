@@ -16,4 +16,7 @@ public interface UserRepo extends JpaRepository<Users, Long> {
     
     @Query("SELECT u FROM Users u WHERE LOWER(u.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(u.designation) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR CAST(u.phone AS string) LIKE LOWER(CONCAT('%', :keyword, '%')) OR CAST(u.id AS string) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Users> searchUsers(String keyword);
+
+    @Query("SELECT COUNT(u) > 0 FROM Users u WHERE u.username = :username")
+    boolean existsByUsername(String username);
 }

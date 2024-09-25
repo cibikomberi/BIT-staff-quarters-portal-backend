@@ -22,6 +22,14 @@ public class CheckoutService {
         return checkouts;
     }
 
+    public List<Checkouts> searchCheckouts(String keyword) {
+        List<Checkouts> checkouts = checkoutRepo.searchCheckouts(keyword);
+        for (Checkouts checkout : checkouts) {
+            checkout.setPin(null);
+        }
+        return checkouts;
+    }
+
     public List<Checkouts> getAllCheckoutsByUser(Long id) {
         return checkoutRepo.findByFaculty_Id(id);
     }
@@ -31,8 +39,6 @@ public class CheckoutService {
     }
 
     public boolean checkout(Long id, String pin) throws Exception {
-        System.out.println(id);
-        System.out.println(pin);
         Checkouts checkout = checkoutRepo.findById(id).get();
         if (checkout.getPin().equals(pin)) {
             checkoutRepo.delete(checkout);
@@ -41,8 +47,5 @@ public class CheckoutService {
         throw new Exception("Pin not verified");
     }
 
-    public List<Checkouts> searchCheckouts(String keyword) {
-        return checkoutRepo.searchCheckouts(keyword);
-    }
 
 }

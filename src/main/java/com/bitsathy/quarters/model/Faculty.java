@@ -23,7 +23,6 @@ public class Faculty extends Users{
 
     private String facultyId;
     private String department;
-    private String designation;
     private String quartersNo;
     private String address;
     private Long aadhar;

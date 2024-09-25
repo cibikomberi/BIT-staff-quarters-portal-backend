@@ -42,10 +42,6 @@ public class GuestService {
         for (Guest guest : guests) {
 
             // Verify fields
-            System.out.println(guest.getFromDate());
-            System.out.println(guest.getToDate());
-            System.out.println(lowerBound);
-            System.out.println(upperBound);
             if (guest.getName() == null || guest.getName().trim().equals("")) {
                 throw new Exception("Invalid guest name");
             }
@@ -84,6 +80,7 @@ public class GuestService {
                     .pin(pin)
                     .faculty(guest.getFaculty())
                     .build());
+                    
             guestRepo.delete(guest);
             return "Ok";
         }
